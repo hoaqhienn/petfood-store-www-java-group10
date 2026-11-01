@@ -16,7 +16,7 @@ Workflow `.github/workflows/ci.yml` có ba job:
 2. Frontend cài dependency theo lockfile + TypeScript + build.
 3. Docker Compose build/khởi động toàn stack + smoke test frontend, API proxy và health.
 
-Xem kết quả thực tế tại [GitHub Actions](https://github.com/hoaqhienn/petfood-store-www-java-group10/actions). Cấu hình workflow không đồng nghĩa workflow đã chạy thành công.
+**Cả ba job đã pass** cho commit `d2c24b0398a9e8f7720f902d616a92257059c1de` tại [lần chạy CI 41328277688](https://github.com/hoaqhienn/petfood-store-www-java-group10/actions/runs/41328277688). Full-stack Docker đã khởi động và smoke test thành công trên GitHub runner Linux. Những thay đổi sau đó cần xem kết quả CI tương ứng.
 
 ## Giới hạn
 
