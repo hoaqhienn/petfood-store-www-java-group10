@@ -39,6 +39,21 @@ Chuẩn bị: guest, customer A/B, admin, user bị khóa; 2 loại, SKU ACTIVE/
 
 ## Cách phân bổ kiểm thử
 
+### Bổ sung từ rà soát ràng buộc
+
+Các dòng này cũng là TODO, chưa chạy; xem [CONSTRAINTS.md](CONSTRAINTS.md).
+
+| ID | Feature / rule | Mức | Kịch bản → kết quả mong đợi |
+|---|---|---|---|
+| AC31 | F02,05 / BR10,14 | P0 | Hai tab sửa cùng revision → chỉ một ghi thành công, còn lại 409; cleanup checkout đồng thời không xóa revision mới |
+| AC32 | F05 / BR14–15 | P0 | A đặt rồi logout, B/guest dùng lại key/body → không nhận đơn A; user A bị khóa không replay được đơn qua Session cũ |
+| AC33 | F03,07–08 / BR06,08 | P0 | Body register/PATCH nhét role/status/stock ngoài quyền → bị từ chối, không cấp admin hay thay đổi trường được bảo vệ |
+| AC34 | F04,08 / BR08 | P0 | Bootstrap admin chạy hai lần không tạo trùng/reset password; không có credential cố định trong source/log |
+| AC35 | F01,05,07 / BR02,12 | P0 | SKU trùng, giá/trọng lượng không dương, số vượt miền biểu diễn, dữ liệu nhận hàng thiếu/sai → lỗi trường rõ, không ghi một phần; giới hạn cụ thể cần chốt trước DTO |
+| AC36 | F05,07 / BR03,12–13 | P0 | Checkout cạnh tranh ẩn loại/SKU: nếu ẩn hoàn tất trước thì checkout thất bại; nếu checkout hoàn tất trước thì đơn snapshot hợp lệ và sau đó SKU bị ẩn |
+
+Số kịch bản hiện tại: **36**; AC01–AC30 giữ nguyên mã để tránh phá tham chiếu. Bổ sung test concurrency Redis cho AC31, quyền replay/DTO cho AC32–34, transaction/validation cho AC35–36.
+
 - Unit: validation, tính tiền, chuyển trạng thái, delta tồn và quyền sửa.
 - Integration PostgreSQL/Redis: AC06, AC10–13, AC15–16, AC18–19, AC21–22, AC30; kiểm tra race thật bằng hai transaction, không chỉ mock repository.
 - API/security: quyền, ownership, CSRF, password DTO và error contract.

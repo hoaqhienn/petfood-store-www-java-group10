@@ -27,9 +27,9 @@ erDiagram
 | order_history | id, order_id, actor_id nullable, action, from_status, to_status, quantity_change, reason, created_at | Append-only; ghi cả sửa quantity và chuyển trạng thái; không lưu PII không cần thiết |
 | checkout_request | id, customer_id, idempotency_key, fingerprint, cart_token, cart_revision, order_id | UNIQUE(customer_id, key), UNIQUE(cart_token, cart_revision), order_id UNIQUE; lưu cùng transaction đơn |
 | notification_outbox | id/event_id, type, aggregate_id, payload, status, attempts, next_attempt_at, created_at, sent_at | Type REGISTRATION/ORDER_PLACED; payload tối thiểu cần gửi mail, không log payload; retry theo BR20 |
-| inventory_movement | id, product_id, order_id nullable, actor_id nullable, delta, reason, created_at | Ghi biến động tồn cho checkout/sửa/hủy/điều chỉnh; cùng transaction cập nhật product |
+| inventory_movement | id, product_id nullable, sku_snapshot, order_id nullable, actor_id nullable, delta, reason, created_at | FK product ON DELETE SET NULL; ghi biến động tồn cùng transaction cập nhật product; snapshot giữ lịch sử SKU |
 
-Event `ORDER_PLACED` là tiếp nhận đặt hàng, không đồng nghĩa order status CONFIRMED của admin. Với SKU chưa từng có order_item, lịch sử điều chỉnh tồn không được làm mất khả năng xóa theo đề bài: khi xóa hợp lệ, chuyển product_id của movement sang null và giữ SKU snapshot tối thiểu; không cascade xóa movement. Thêm trường sku_snapshot cho inventory_movement khi viết migration.
+Event `ORDER_PLACED` là tiếp nhận đặt hàng, không đồng nghĩa order status CONFIRMED của admin. Với SKU chưa từng có order_item, lịch sử điều chỉnh tồn không được làm mất khả năng xóa theo đề bài: khi xóa hợp lệ, product_id của movement thành null và sku_snapshot giữ nguyên; không cascade xóa movement. FK RESTRICT từ order_item vẫn ngăn xóa sản phẩm đã có đơn.
 
 Tiền dùng numeric/BigDecimal; version dùng optimistic concurrency. Enum/giới hạn số và giá được validate ở Java; FK/PK/UNIQUE trong DB. Không tự viết CHECK/function/stored procedure. Index dự kiến: product(category_id,status), order(customer_id,created_at,id), order(status,created_at,id), outbox(status,next_attempt_at).
 
