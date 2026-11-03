@@ -9,6 +9,8 @@
 - Thành công: GET/PATCH 200, tạo resource 201, DELETE/logout 204. POST command có payload trả 200; checkout mới 201, replay 200.
 - Lỗi: `{code, message, fieldErrors: [{field,message}], traceId}`; không stack trace/secret/PII. 400 JSON/query sai; 401 chưa login; 403 role/CSRF không hợp lệ; 404 không tồn tại hoặc không thuộc owner; 409 xung đột; 422 validation nghiệp vụ; 429 quota; 503 dịch vụ phụ thuộc chưa sẵn sàng.
 - Các update có version; request body không có userId/role tùy ý để quyết định actor. Backend lấy actor từ Session. Quyền customer áp dụng cả admin đang mua cho chính mình.
+- Các mã 401/403 ở trên là hợp đồng khi có identity; bộ khung hiện chỉ denyAll route chưa triển khai. DTO whitelist phải từ chối trường nhạy cảm ngoài quyền ghi, không tự bind entity từ body.
+- Cart mutation kiểm tra expectedRevision/cập nhật nguyên tử; sau DELETE 204 frontend đọc lại GET /cart để lấy revision mới. Replay order cũng kiểm tra user ACTIVE/ownership trước tra cứu key; key không thay thế authentication.
 
 ## P0 — catalog và identity
 

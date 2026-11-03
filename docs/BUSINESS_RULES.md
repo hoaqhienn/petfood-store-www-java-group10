@@ -72,6 +72,15 @@ Giới hạn demo: chưa xử lý trả hàng/hoàn tiền/thu thiếu/giao th�
 
 ## Quyết định cần review trước triển khai
 
+### Làm rõ khi triển khai
+
+- BR10/BR14: expectedRevision và cập nhật giỏ phải nguyên tử trên Redis; không chỉ read-check-write Session trong Java. Compare-and-clear giỏ sau checkout cũng nguyên tử để không mất cập nhật của tab khác.
+- BR14: authentication, trạng thái ACTIVE và ownership được kiểm tra trước khi replay theo key. Lookup theo actor/key; không cho phép dùng key của tài khoản khác để lấy order. Replay chỉ bỏ qua điều kiện giỏ/quote đã tiêu thụ, không bỏ qua quyền.
+- BR06/BR08: bootstrap admin bằng cấu hình local riêng, không seed password cố định vào Git; chạy lại không tạo trùng hoặc reset mật khẩu. DTO dùng whitelist, không mass-assign role/status hoặc trường ngoài quyền được cấp.
+- BR12/BR13: checkout và thao tác ẩn loại/sản phẩm phải có thứ tự đồng bộ rõ ràng; không cho giao dịch ẩn hoàn tất trước bước commit checkout mà checkout vẫn dựa vào trạng thái ACTIVE cũ. AC36 kiểm thử hai thứ tự thực thi.
+
+Ma trận RB và trạng thái hiện thực tại [CONSTRAINTS.md](CONSTRAINTS.md).
+
 | ID | Đề xuất | Lý do / tác động |
 |---|---|---|
 | D01 | SKU theo quy cách, một loại/SKU | Giảm phức tạp biến thể |

@@ -19,6 +19,8 @@ Thời gian dự kiến: **01–30/11/2026**.
 
 ## Công nghệ
 
+Rà soát bổ sung: [CONSTRAINTS.md](docs/CONSTRAINTS.md) ánh xạ RB01–RB22 sang nơi thực thi và kịch bản kiểm thử; danh sách nghiệm thu hiện tăng từ 30 lên **36**. Những ràng buộc nghiệp vụ này chưa được triển khai trong mã chạy.
+
 | Thành phần | Lựa chọn |
 |---|---|
 | Backend | Java 17, Spring Boot 3.5.16, Gradle Wrapper 8.14.3 |
@@ -87,6 +89,7 @@ compose.yaml
 - [Kiến trúc và quyết định kỹ thuật](docs/ARCHITECTURE.md)
 - [Yêu cầu môn học và phạm vi](docs/REQUIREMENTS.md)
 - [Quy tắc nghiệp vụ và quyết định cần review](docs/BUSINESS_RULES.md)
+- [Ràng buộc ứng dụng và kết quả rà soát](docs/CONSTRAINTS.md)
 - [Mô hình dữ liệu dự kiến](docs/DOMAIN_MODEL.md)
 - [Hợp đồng API dự thảo](docs/API_CONTRACT.md)
 - [Kịch bản nghiệm thu](docs/ACCEPTANCE.md)

@@ -56,6 +56,7 @@ Guest không có bản ghi user trong DB. Đăng ký luôn tạo CUSTOMER; clien
 ## Bộ tài liệu triển khai
 
 - [Quy tắc nghiệp vụ và quyết định đề xuất](BUSINESS_RULES.md)
+- [Ma trận ràng buộc, nơi thực thi và coverage](CONSTRAINTS.md)
 - [Mô hình dữ liệu dự kiến](DOMAIN_MODEL.md)
 - [Hợp đồng API dự thảo](API_CONTRACT.md)
 - [Kịch bản nghiệm thu](ACCEPTANCE.md)

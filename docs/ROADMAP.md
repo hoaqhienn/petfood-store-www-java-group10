@@ -9,6 +9,8 @@
 
 ## Backlog triển khai có phụ thuộc
 
+Rà soát sau bản phân tích: dùng thêm CONSTRAINTS.md và AC31–AC36. T02 cần bootstrap admin/DTO whitelist; T04 cần kiểm thử giỏ nhiều tab; T05 cần quyền replay và cạnh tranh ẩn SKU/category. Tổng số kịch bản hiện là 36, trạng thái nghiệp vụ vẫn TODO.
+
 Owner là người chủ đạo; người còn lại review và có thể nhận task chéo. Mỗi dòng nên thành một hoặc vài PR nhỏ; bảng chưa tự tạo GitHub issues hay giao việc bên ngoài.
 
 | Task | Mốc mục tiêu | Hoàng Hiện | Minh Anh | Phụ thuộc / nghiệm thu |
