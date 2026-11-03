@@ -15,6 +15,8 @@ Thời gian dự kiến: **01–30/11/2026**.
 - Có: kiểm thử API, kiểm thử tích hợp hạ tầng và GitHub Actions.
 - Chưa có: đăng ký/đăng nhập, CRUD nghiệp vụ, giỏ hàng, checkout, email nghiệp vụ, AI và tracking.
 
+**Phân tích cập nhật 03/11/2026:** đã bổ sung danh mục 15 chức năng, ma trận quyền, quy tắc đơn COD/tồn kho, API dự thảo, mô hình dữ liệu và 30 kịch bản nghiệm thu. Đây là tài liệu thiết kế, chưa triển khai nghiệp vụ; các quyết định D01–D08 được đánh dấu đề xuất để review.
+
 ## Công nghệ
 
 | Thành phần | Lựa chọn |
@@ -84,6 +86,10 @@ compose.yaml
 - [Hướng dẫn phát triển local và xử lý lỗi](docs/LOCAL_DEVELOPMENT.md)
 - [Kiến trúc và quyết định kỹ thuật](docs/ARCHITECTURE.md)
 - [Yêu cầu môn học và phạm vi](docs/REQUIREMENTS.md)
+- [Quy tắc nghiệp vụ và quyết định cần review](docs/BUSINESS_RULES.md)
+- [Mô hình dữ liệu dự kiến](docs/DOMAIN_MODEL.md)
+- [Hợp đồng API dự thảo](docs/API_CONTRACT.md)
+- [Kịch bản nghiệm thu](docs/ACCEPTANCE.md)
 - [Lộ trình và phân công](docs/ROADMAP.md)
 - [Quy tắc làm việc nhóm](CONTRIBUTING.md)
 - [Kết quả kiểm chứng bộ khung](docs/VERIFICATION.md)
