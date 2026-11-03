@@ -1,5 +1,32 @@
 # Lộ trình tháng 11/2026
 
+## Trạng thái ngày 03/11
+
+- Bộ khung và CI đã có; tham chiếu VERIFICATION.md cho lần chạy đã kiểm chứng.
+- Hoàn thành bản phân tích tài liệu: F01–F15, BR01–BR26, D01–D08, API, mô hình dữ liệu và AC01–AC30.
+- Các module nghiệp vụ vẫn TODO; không tính bản phân tích này là đã hoàn thành đăng nhập/catalog/checkout.
+- Cần review D01–D08 trước migration P0; provider/model/ngân sách AI chỉ chặn P1.
+
+## Backlog triển khai có phụ thuộc
+
+Owner là người chủ đạo; người còn lại review và có thể nhận task chéo. Mỗi dòng nên thành một hoặc vài PR nhỏ; bảng chưa tự tạo GitHub issues hay giao việc bên ngoài.
+
+| Task | Mốc mục tiêu | Hoàng Hiện | Minh Anh | Phụ thuộc / nghiệm thu |
+|---|---|---|---|---|
+| T01 Review nghiệp vụ, ERD/API | 03–04/11 | Dữ liệu, transaction | Màn hình, error states | Chốt D01–D08; thống nhất API_CONTRACT |
+| T02 Identity + Session | 04–07/11 | Migration user, register/login, CSRF, quyền | Form tài khoản, API client, bảo vệ route | T01; AC05–08 |
+| T03 Catalog/category | 04–07/11 | Migration/API, seed, stock adjustment | List/detail, bộ lọc, form admin | T01; AC01–02,18,30; admin cần T02 |
+| T04 Cart guest → customer | 08–09/11 | Redis cart/revision, giữ giỏ login | Trang giỏ, feedback thiếu tồn/Session | T02–03; AC03–04,07,22 |
+| T05 COD + email | 09–12/11 | Preview, idempotency, transaction, outbox | Checkout, confirm, lịch sử đơn, retry | T04; AC09–14,21–22 |
+| T06 Admin user/order | 12–14/11 | State machine, delta tồn, ownership | Danh sách/chi tiết, sửa, xác nhận xóa | T02–05; AC15–20 |
+| T07 Hồ sơ + vector/RAG | 15–21/11 | Pet API, model adapter, ingestion/retrieval | Hồ sơ, chat, tìm kiếm tự nhiên | P0 ổn định + provider; AC23–26 |
+| T08 Tracking + cá nhân hóa | 22–26/11 | Consent/events, tổng hợp, ranking | Preferences, instrumentation, dashboard | T05,T07; AC27–29 |
+| T09 Ổn định/báo cáo | 27–30/11 | Integration/concurrency, tài liệu | E2E/responsive, demo | P0 phải đạt; P1 ghi rõ phần còn thiếu |
+
+Ưu tiên khi thiếu thời gian: không cắt ràng buộc đề bài, phân quyền hoặc tính đúng đơn/tồn để làm dashboard đẹp. Giảm độ sâu cá nhân hóa, giữ tìm kiếm/RAG có căn cứ và fallback. Thanh toán online vẫn P2.
+
+## Tổng quan mốc ban đầu
+
 | Mốc | Hoàng Hiện chủ đạo | Minh Anh chủ đạo | Kết quả |
 |---|---|---|---|
 | 01–07/11 | Schema, xác thực Session, catalog API | Layout, catalog, trang tài khoản | Đăng ký/đăng nhập và xem sản phẩm |

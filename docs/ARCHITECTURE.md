@@ -1,5 +1,7 @@
 # Kiến trúc
 
+**Cập nhật phân tích 03/11/2026:** chưa thay đổi mã chạy hoặc schema. Tham chiếu [chức năng](REQUIREMENTS.md), [quy tắc](BUSINESS_RULES.md), [mô hình miền](DOMAIN_MODEL.md), [API](API_CONTRACT.md) và [nghiệm thu](ACCEPTANCE.md). D01–D08 là đề xuất cần review, không phải quyết định đã được người dùng phê duyệt.
+
 ## Quyết định nền tảng
 
 Dùng một **modular monolith**, một repo và một backend Spring Boot. Chưa cần microservices, Kafka hay Kubernetes cho hai thành viên.
@@ -37,7 +39,7 @@ Spring Security hiện chỉ public GET `/api/v1/info` và `/actuator/health`; m
 
 Redis hiện được Spring Session dùng để lưu HttpSession, timeout 30 phút. Không có endpoint tạo giỏ hàng ở bộ khung. Tương lai Session chứa giỏ gồm mã sản phẩm/số lượng; không tin giá do client gửi. Giá/tồn kho phải được đọc và kiểm tra lại khi checkout.
 
-Sau đăng nhập cần giữ giỏ guest trong Session và bảo vệ session fixation. Sau checkout thành công chỉ xóa thuộc tính giỏ, không hủy phiên đăng nhập. Tránh nhân đôi đơn bằng idempotency key ở bước triển khai checkout.
+Sau đăng nhập cần giữ giỏ guest trong Session và bảo vệ session fixation. Sau checkout thành công chỉ xóa thuộc tính giỏ đúng revision, không hủy phiên đăng nhập hoặc xóa giỏ mới của tab khác. Dùng idempotency key + cart revision ở DB để chống mua lặp. Commit PostgreSQL và cleanup Redis là hai bước, không giả định atomic; quy tắc phục hồi theo BR14.
 
 Redis không phải nơi lưu đơn hàng lâu dài. Cache danh mục và rate limit AI là phần mở rộng; chưa cấu hình. Tránh cache sớm khi chưa có cơ chế invalidation.
 
@@ -46,6 +48,8 @@ Redis không phải nơi lưu đơn hàng lâu dài. Cache danh mục và rate l
 Flyway V1 chỉ bật `vector` extension. Chưa tạo schema nghiệp vụ hoặc vector table vì cần chốt mô hình dữ liệu và embedding model/dimension trước. Không bật tự tạo bảng của thư viện AI ngoài luồng migration.
 
 Thiết kế dự kiến gồm user, category, product, order/order_item, pet_profile, behavior_event và bảng embedding. Không tự viết database function/CHECK constraint/stored procedure. PK/FK/UNIQUE vẫn cần, nhất là email unique để chống race condition.
+
+Bản phân tích mới bổ sung order_history, checkout_request, inventory_movement và notification_outbox ở P0. Order/stock/email event commit cùng transaction; gửi SMTP sau commit và retry, không rollback đơn vì mail lỗi. P1 có consent_preference và embedding_job; vector dimension còn chờ lựa chọn model. Xem DOMAIN_MODEL.md để không nhầm với bảng đã tồn tại.
 
 ## AI và tracking — dự kiến, chưa triển khai
 
