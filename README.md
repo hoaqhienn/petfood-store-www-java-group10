@@ -87,6 +87,7 @@ compose.yaml
 
 - [Danh mục và đặc tả use case](docs/USE_CASES.md)
 - [Use Case Diagram và lộ trình UML](docs/design/README.md)
+- [Activity Diagram — 8 luồng P0](docs/design/activities/README.md)
 
 - [Hướng dẫn phát triển local và xử lý lỗi](docs/LOCAL_DEVELOPMENT.md)
 - [Kiến trúc và quyết định kỹ thuật](docs/ARCHITECTURE.md)

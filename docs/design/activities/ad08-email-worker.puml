@@ -1,0 +1,40 @@
+@startuml
+title AD08 — Gửi email sau commit (hỗ trợ UC03 / UC07 / UC17)
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+|Worker PetFood|
+start
+:Claim event đến hạn đã commit;
+note right: Không phải actor người dùng mới.
+if (Event còn hợp lệ?) then (Không)
+  :Hủy event; không gửi mail user đã bị xóa;
+  stop
+else (Có)
+endif
+:Tạo nội dung tối thiểu;
+|SMTP / Mailpit|
+:Nhận yêu cầu gửi mail;
+if (Gửi được và có xác nhận?) then (Có)
+  |Worker PetFood|
+  :Đánh dấu SENT;
+  note right
+    Nếu lỗi ghi SENT sau khi gửi,
+    lần retry có thể gây email trùng.
+  end note
+else (Không / timeout)
+  |Worker PetFood|
+  :Tăng attempts; lưu lỗi đã che PII;
+  if (Còn lượt retry?) then (Có)
+    :Đặt PENDING, next_attempt_at có backoff;
+  else (Không)
+    :Đặt FAILED; admin có thể dùng UC17;
+  endif
+endif
+:Không thay đổi kết quả tạo tài khoản/đơn;
+stop
+legend
+  D08: 3 lần thử là đề xuất; SMTP at-least-once.
+  Email không phải bước chặn response đặt hàng.
+  BR19–20; AC21.
+endlegend
+@enduml

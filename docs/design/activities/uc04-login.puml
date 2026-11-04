@@ -1,0 +1,50 @@
+@startuml
+title UC04 — Đăng nhập và giữ giỏ guest
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+|Guest|
+start
+:Nhập email/mật khẩu và gửi;
+|PetFood API|
+:Kiểm tra CSRF và dữ liệu;
+if (Request hợp lệ?) then (Không)
+  :Trả lỗi; không xác thực phiên;
+  stop
+else (Có)
+endif
+:Tra tài khoản, kiểm tra password hash;
+if (Credentials đúng?) then (Không)
+  :Lỗi chung; không tiết lộ email tồn tại;
+  stop
+else (Có)
+endif
+if (Tài khoản ACTIVE?) then (Không)
+  :Từ chối tài khoản bị khóa;
+  stop
+else (Có)
+endif
+|Session / Redis|
+:Đổi session ID,
+giữ cartToken/revision và dòng giỏ;
+:Lưu trạng thái xác thực;
+if (Lưu phiên thành công?) then (Không)
+  :Không báo login thành công;
+  :API trả lỗi dịch vụ;
+  stop
+else (Có)
+endif
+|Frontend|
+:Nhận cookie và hồ sơ/quyền;
+:Lấy CSRF token mới;
+:Về trang trước hoặc trang chủ;
+note right
+  Không tự gửi lại checkout.
+  Guest không có giỏ thì giỏ rỗng.
+  Session cũ không còn quyền sau đổi ID.
+end note
+stop
+legend
+  BR07–08; AC07–08.
+  Ràng buộc cạnh tranh giỏ cần kiểm thử cùng UC02.
+endlegend
+@enduml

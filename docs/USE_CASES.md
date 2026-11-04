@@ -186,9 +186,9 @@ Provider/model/quota/retention chi tiết còn mở. Ghi event chỉ khi có con
 ## Lộ trình sơ đồ tiếp theo
 
 1. Use Case Diagram tổng quan: nguồn PlantUML và bản xem nhanh ở [design/README.md](design/README.md).
-2. Activity: UC03,04,02,07,15,16 và nhánh xóa UC10/11/13; ưu tiên UC07.
+2. Activity: đã có [8 sơ đồ P0 và email nền](design/activities/README.md), gồm UC03,04,02,07,09,15,16 và nhánh xóa UC10/11/13; nguồn PlantUML và SVG.
 3. Domain Class + ERD: đối chiếu DOMAIN_MODEL với UC và quyết định D01–D08; chưa là DDL cuối.
 4. Sequence: UC07 thành công/retry/lỗi, UC03 SMTP lỗi, UC15 cạnh tranh; xác định transaction và ranh giới Redis.
 5. Design Class: rút trách nhiệm controller/service/repository từ sequence, rồi chốt API/migration.
 
-Chưa đánh dấu các sơ đồ bước 2–5 là hoàn thành. Không cần chờ P1 chi tiết để triển khai P0 đã review.
+Activity bước 2 là bản thiết kế dự thảo; bước 3–5 chưa hoàn thành. Không cần chờ P1 chi tiết để triển khai P0 đã review.

@@ -1,0 +1,74 @@
+@startuml
+title UC10 / UC11 / UC13 — Xóa dữ liệu có ràng buộc
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+|Admin|
+start
+:Chọn bản ghi và xác nhận xóa;
+|PetFood API|
+:Kiểm tra ADMIN ACTIVE, CSRF và loại tài nguyên;
+if (Đủ quyền?) then (Không)
+  :Từ chối; không ghi;
+  stop
+else (Có)
+endif
+|Transaction PostgreSQL|
+:Khóa/đọc bản ghi và kiểm tra tồn tại;
+if (Tồn tại?) then (Không)
+  :404; kết thúc transaction;
+  stop
+else (Có)
+endif
+if (Sản phẩm?) then (Có)
+  :Kiểm tra order_item ở mọi trạng thái;
+  if (Đã được đặt?) then (Có)
+    :409 PRODUCT_REFERENCED;
+    stop
+  else (Không)
+  endif
+  :Xóa SKU; movement giữ snapshot,
+product_id thành null;
+  :Dọn embedding/job nếu P1 đã có;
+elseif (Loại sản phẩm?) then (Có)
+  :Kiểm tra mọi SKU, kể cả ẩn;
+  if (Còn SKU?) then (Có)
+    :409 CATEGORY_NOT_EMPTY;
+    stop
+  else (Không)
+  endif
+  :Xóa loại;
+else (Tài khoản)
+  :Kiểm tra đơn mọi trạng thái và bảo vệ admin;
+  if (Có đơn / admin hiện tại / admin cuối?) then (Có)
+    :409 USER_HAS_ORDERS hoặc ADMIN_PROTECTED;
+    stop
+  else (Không)
+  endif
+  :Xóa phụ thuộc cá nhân;
+  :Hủy outbox chưa gửi; audit actor thành null;
+  :Xóa user;
+endif
+:Áp dụng FK/UNIQUE và commit;
+if (Tham chiếu phát sinh hoặc commit lỗi?) then (Có)
+  :Rollback; conflict/lỗi, không xóa một phần;
+  stop
+else (Không)
+endif
+|PetFood API|
+if (Đã xóa user?) then (Có)
+  :Thu hồi Session;
+  note right
+    Redis lỗi: retry thu hồi.
+    API vẫn từ chối user không còn tồn tại.
+  end note
+else (Không)
+endif
+|Admin|
+:Nhận kết quả; làm mới danh sách;
+stop
+legend
+  Không cascade xóa đơn hoặc order_item.
+  Mọi nhánh từ chối trong transaction phải rollback/kết thúc.
+  BR04,08–09; AC18–19.
+endlegend
+@enduml

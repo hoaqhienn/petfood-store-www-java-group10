@@ -1,0 +1,97 @@
+@startuml
+title UC07 — Đặt hàng COD
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+|Khách hàng|
+start
+:Mở checkout;
+|PetFood API|
+if (Customer/Admin ACTIVE?) then (Không)
+  :Yêu cầu đăng nhập UC04;
+  note right: Không tự gửi lại thao tác mua sau login.
+  stop
+else (Có)
+endif
+:Đọc giỏ và lập báo giá từ DB;
+if (Giỏ hợp lệ và dịch vụ sẵn sàng?) then (Không)
+  :Báo lỗi; giữ giỏ;
+  stop
+else (Có)
+endif
+|Khách hàng|
+:Nhập thông tin nhận hàng;
+:Xem giá/phí và xác nhận COD;
+|Frontend|
+:Tạo key cho ý định mua;
+:Gửi body cố định và Idempotency-Key;
+note right
+  Mất response: retry đúng body/key.
+  Thay đổi ý định mua: preview và xác nhận lại.
+end note
+|PetFood API|
+:Kiểm tra CSRF, actor ACTIVE,
+ownership và dữ liệu request;
+if (Đủ quyền và request hợp lệ?) then (Không)
+  :Trả lỗi; không tiết lộ đơn người khác;
+  stop
+else (Có)
+endif
+:Tra cứu kết quả theo actor/key;
+if (Đã có kết quả?) then (Có)
+  if (Fingerprint trùng?) then (Có)
+    :Trả đơn cũ; không trừ tồn thêm;
+    note right: Replay không cần giỏ/quote còn hạn.
+  else (Không)
+    :409 IDEMPOTENCY_CONFLICT;
+  endif
+  stop
+else (Không)
+endif
+:Kiểm tra quote/revision/giá;
+if (Báo giá và giỏ còn hợp lệ?) then (Không)
+  :409; yêu cầu xem lại báo giá;
+  stop
+else (Có)
+endif
+|Transaction PostgreSQL|
+:Đồng bộ request/cart revision;
+note right
+  UNIQUE + locking: request cạnh tranh
+  phải trả cùng kết quả hoặc conflict.
+end note
+:Khóa và kiểm tra lại loại/SKU/tồn;
+if (Tất cả dòng đủ điều kiện?) then (Không)
+  :Rollback; giữ giỏ;
+  stop
+else (Có)
+endif
+:Lưu đơn PENDING/UNPAID,
+dòng snapshot, trừ tồn,
+movement, history, key và outbox;
+if (Commit thành công?) then (Không)
+  :Rollback; báo lỗi có thể retry;
+  stop
+else (Có)
+endif
+|PetFood API|
+:Compare-and-clear giỏ đã mua;
+if (Redis lỗi hoặc revision đã đổi?) then (Có)
+  :Giữ đơn đã commit;
+  :Retry/reconcile cleanup khi lỗi;
+  note right: Không xóa giỏ mới của tab khác.
+else (Không)
+endif
+|Frontend|
+:Hiển thị mã đơn và
+đặt hàng thành công, COD chưa thu tiền;
+note right
+  Worker gửi outbox độc lập (AD08).
+  Email lỗi không rollback đơn.
+end note
+stop
+legend
+  Giả định: D02 trừ tồn lúc PENDING; D05 ship demo=0;
+  D08 quote 10 phút. Chưa phải chính sách đã chốt.
+  Liên kết: BR11–15,19–20; AC09–13,21–22,32,36.
+endlegend
+@enduml

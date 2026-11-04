@@ -1,0 +1,55 @@
+@startuml
+title UC15 — Admin sửa số lượng mặt hàng trong đơn
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+|Admin|
+start
+:Đọc đơn/version;
+:Nhập quantity mới và lý do;
+|PetFood API|
+:Kiểm tra ADMIN ACTIVE, CSRF,
+quantity và whitelist;
+if (Hợp lệ?) then (Không)
+  :Từ chối; không ghi;
+  stop
+else (Có)
+endif
+|Transaction PostgreSQL|
+:Khóa đơn, xác định item thuộc đơn;
+if (Đúng version và PENDING/CONFIRMED?) then (Không)
+  :Rollback; conflict hoặc không được sửa;
+  stop
+else (Có)
+endif
+:Tính delta = mới - cũ; khóa SKU;
+if (delta > 0?) then (Có)
+  :Kiểm tra SKU/loại ACTIVE và đủ tồn;
+  if (Không đáp ứng?) then (Có)
+    :Rollback; giữ đơn/tồn;
+    stop
+  else (Không)
+  endif
+else (Không)
+endif
+:Tồn mới = tồn cũ - delta;
+note right
+  delta < 0 hoàn chênh lệch tồn.
+  delta = 0 không tạo movement thay đổi tồn.
+  SKU ẩn vẫn được giảm, không được tăng.
+end note
+:Cập nhật quantity, tổng theo giá snapshot,
+version, movement và lịch sử;
+if (Commit thành công?) then (Không)
+  :Rollback toàn bộ;
+  stop
+else (Có)
+endif
+|Admin|
+:Nhận đơn/version mới;
+stop
+legend
+  D03: chỉ sửa PENDING/CONFIRMED.
+  Không thêm/xóa dòng, quantity=0 bị từ chối.
+  BR16–17; AC16–17.
+endlegend
+@enduml

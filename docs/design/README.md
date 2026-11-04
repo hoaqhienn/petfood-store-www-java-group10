@@ -1,5 +1,7 @@
 # Thiết kế UML
 
+**Đã bổ sung:** [8 Activity Diagram có nguồn và SVG](activities/README.md) cho P0: COD, đăng ký/login, giỏ, sửa/trạng thái đơn, xóa dữ liệu và email nền. Các giả định nghiệp vụ được đánh dấu, chưa phải chức năng đã lập trình.
+
 Nguồn Use Case Diagram: [use-cases.puml](use-cases.puml), liên kết [đặc tả UC01–UC23](../USE_CASES.md). GitHub không render PlantUML trực tiếp; mở nguồn bằng công cụ PlantUML trong IDE hoặc xuất SVG khi chuẩn bị báo cáo. Nguồn chưa được render/kiểm chứng hình ảnh trong lần cập nhật này.
 
 Bản đồ dưới đây dùng Mermaid để đọc ngay trên GitHub; **đây là bản đồ chức năng, không thay thế ký pháp UML use case**. Các nhóm chỉ để trình bày; sơ đồ PlantUML liệt kê đủ từng UC và quan hệ kế thừa actor.
@@ -22,4 +24,4 @@ SMTP thực tế chỉ hỗ trợ UC03/07/17, không login hay các use case kh�
 
 Không dùng include/extend để biểu diễn thứ tự trang hoặc điều hướng. Đăng nhập là tiền điều kiện checkout; thêm giỏ không bắt buộc phải được gọi trong mỗi lần xem sản phẩm. Email nền là bước hỗ trợ bất đồng bộ được đặc tả bằng luồng/sequence, không buộc SMTP thành công để UC03/07 thành công.
 
-Activity, domain/design class, sequence và ERD chi tiết sẽ được bổ sung theo lộ trình USE_CASES.md. Mô hình dữ liệu sơ bộ hiện nằm ở [DOMAIN_MODEL.md](../DOMAIN_MODEL.md).
+Activity P0 đã có tại liên kết trên. Domain/design class, sequence và ERD chi tiết là các bước tiếp theo theo USE_CASES.md. Mô hình dữ liệu sơ bộ hiện nằm ở [DOMAIN_MODEL.md](../DOMAIN_MODEL.md).
