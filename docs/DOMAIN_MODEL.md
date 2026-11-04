@@ -4,16 +4,7 @@ Thiết kế logic phục vụ review, **chưa phải migration/entity hiện c�
 
 ## Quan hệ P0
 
-```mermaid
-erDiagram
-  USER_ACCOUNT ||--o{ CUSTOMER_ORDER : places
-  CATEGORY ||--o{ PRODUCT : contains
-  CUSTOMER_ORDER ||--|{ ORDER_ITEM : contains
-  PRODUCT ||--o{ ORDER_ITEM : referenced_by
-  CUSTOMER_ORDER ||--|{ ORDER_HISTORY : records
-  USER_ACCOUNT ||--o{ CHECKOUT_REQUEST : retries
-  CUSTOMER_ORDER ||--|| CHECKOUT_REQUEST : created_by
-```
+Xem [Domain Class Diagram và ERD P0](design/domain-erd.md) để đối chiếu bội số, khóa và quy tắc xóa.
 
 ## Bảng/thuộc tính chính
 
