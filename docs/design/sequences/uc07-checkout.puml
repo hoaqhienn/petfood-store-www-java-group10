@@ -1,0 +1,82 @@
+@startuml
+title UC07 — Checkout COD
+skinparam shadowing false
+actor "Khách hàng" as C
+participant "React" as UI
+participant "Checkout API" as API
+database "Redis Session / Quote" as R
+database "PostgreSQL" as DB
+participant "Outbox Worker" as W
+participant SMTP
+
+== Báo giá ==
+C -> UI : Mở checkout
+UI -> API : POST /checkout/preview (cartRevision)
+API -> API : Kiểm tra phiên, quyền checkout, ACTIVE và CSRF
+API -> R : Đọc giỏ theo Session và revision
+API -> DB : Đọc SKU, giá, khả năng bán
+alt Giỏ và dữ liệu hợp lệ
+  API -> R : Lưu quote TTL gắn actor/token/revision và giá
+  API --> UI : quoteToken, expiresAt và tổng tiền
+else Preview thất bại
+  API --> UI : Báo lỗi, giữ giỏ
+end
+
+== Xác nhận COD ==
+C -> UI : Xác nhận báo giá và thông tin nhận hàng
+UI -> API : POST /orders + Idempotency-Key và body
+API -> API : Kiểm tra phiên, ACTIVE, CSRF, body và fingerprint
+alt Request không hợp lệ hoặc không đủ quyền
+  API --> UI : Từ chối, không tiết lộ dữ liệu đơn
+else Request hợp lệ
+  API -> DB : Tra kết quả theo actor đã xác thực + key
+  alt Tìm thấy receipt
+    API -> API : So sánh fingerprint
+    API --> UI : Cùng fingerprint: trả đơn cũ\nKhác fingerprint: IDEMPOTENCY_CONFLICT
+  else Chưa có receipt
+    API -> R : Đọc quote theo token và giỏ Session
+    API -> API : Kiểm tra chủ quote, TTL, token và revision
+    alt Quote/giỏ không hợp lệ
+      API -> DB : Tra lại actor + key trước khi trả lỗi
+      API --> UI : Kết quả replay nếu đã commit\nNếu chưa: lỗi quote/giỏ
+    else Quote/giỏ hợp lệ
+      group Một transaction PostgreSQL
+        API -> DB : BEGIN và khóa SKU theo thứ tự ID
+        API -> DB : Kiểm tra lại giá, khả năng bán, tồn
+        alt Tất cả dòng hợp lệ
+          API -> DB : Ghi đơn PENDING/UNPAID và dòng snapshot
+          API -> DB : Ghi receipt với hai khóa UNIQUE chống trùng
+          alt Ghi receipt và các thay đổi thành công
+            API -> DB : Trừ tồn, ghi movement, history, outbox
+            API -> DB : COMMIT
+          else Vi phạm UNIQUE hoặc ghi thất bại
+            API -> DB : ROLLBACK
+          end
+        else Có dòng không hợp lệ
+          API -> DB : ROLLBACK
+        end
+      end
+      alt Commit được xác nhận
+        API -> R : Compare-and-clear theo cartToken + revision
+        note right of R
+          Bỏ qua nếu giỏ đã đổi.
+          Lỗi Redis không đảo commit.
+        end note
+        API --> UI : Mã đơn, COD chưa thu tiền
+      else Transaction thất bại hoặc chưa rõ kết quả commit
+        API -> DB : Tra receipt trong transaction mới
+        API --> UI : Replay / conflict nếu tìm thấy\nNếu chưa: lỗi nghiệp vụ hoặc retry cùng body/key
+      end
+    end
+  end
+end
+
+== Gửi email sau commit ==
+W -> DB : Đọc sự kiện ORDER_PLACED đã commit
+W -> SMTP : Gửi xác nhận đặt hàng
+alt SMTP xác nhận
+  W -> DB : Đánh dấu SENT
+else Gửi lỗi
+  W -> DB : Lên lịch retry hoặc đánh dấu FAILED
+end
+@enduml

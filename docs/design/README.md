@@ -24,4 +24,6 @@ SMTP thực tế chỉ hỗ trợ UC03/07/17, không login hay các use case kh�
 
 Không dùng include/extend để biểu diễn thứ tự trang hoặc điều hướng. Đăng nhập là tiền điều kiện checkout; thêm giỏ không bắt buộc phải được gọi trong mỗi lần xem sản phẩm. Email nền là bước hỗ trợ bất đồng bộ được đặc tả bằng luồng/sequence, không buộc SMTP thành công để UC03/07 thành công.
 
-[Domain Class Diagram và ERD P0](domain-erd.md) mô tả quan hệ nghiệp vụ, ranh giới Redis/PostgreSQL và các khóa bảo vệ luồng COD. Bước tiếp theo là Sequence Diagram, sau đó là Design Class Diagram. Chi tiết thuộc tính nằm trong [DOMAIN_MODEL.md](../DOMAIN_MODEL.md).
+[Domain Class Diagram và ERD P0](domain-erd.md) mô tả quan hệ nghiệp vụ, ranh giới Redis/PostgreSQL và các khóa bảo vệ luồng COD. Chi tiết thuộc tính nằm trong [DOMAIN_MODEL.md](../DOMAIN_MODEL.md).
+
+[Sequence Diagram UC07](sequences/README.md) mô tả preview, replay, transaction và dọn giỏ sau commit.
