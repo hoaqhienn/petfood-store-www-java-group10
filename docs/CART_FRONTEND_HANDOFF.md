@@ -1,4 +1,4 @@
-# Bàn giao giao diện giỏ hàng cho Minh Anh
+# Bàn giao giao diện giỏ hàng cho Anh Minh
 
 Mục tiêu demo: khách chưa đăng nhập thêm món từ danh sách hoặc chi tiết, mở `/cart`, sửa số lượng, xóa món và tải lại trang vẫn thấy giỏ của phiên đó. Phát triển dựa trên nhánh `feat/session-cart` khi [PR #10](https://github.com/hoaqhienn/petfood-store-www-java-group10/pull/10) còn mở. Sau khi PR vào `main`, dùng `main` làm nhánh gốc.
 

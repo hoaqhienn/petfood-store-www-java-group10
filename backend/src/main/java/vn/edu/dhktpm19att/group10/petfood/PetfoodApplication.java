@@ -1,4 +1,4 @@
-package vn.edu.dhktpm19at.group10.petfood;
+package vn.edu.dhktpm19att.group10.petfood;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

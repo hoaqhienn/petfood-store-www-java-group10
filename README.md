@@ -2,7 +2,7 @@
 
 **Good food. Happy pets.** Website giới thiệu và bán thức ăn chó mèo, ưu tiên tối giản, nhanh và tiện lợi.
 
-Đồ án **Lập trình WWW (Java)** · Lớp **DHKTPM19AT** · **Nhóm 10** · **Đề tài 42**.
+Đồ án **Lập trình WWW (Java)** · Lớp **DHKTPM19ATT** · **Nhóm 10** · **Đề tài 42**.
 Thời gian dự kiến: **01–30/11/2026**.
 
 ## Trạng thái hiện tại
@@ -104,7 +104,7 @@ compose.yaml
 | Thành viên | Phụ trách chính |
 |---|---|
 | Hoàng Hiện | Backend, CSDL, hạ tầng, tích hợp AI |
-| Minh Anh | Frontend khách hàng, quản trị, trải nghiệm người dùng |
+| Anh Minh | Frontend khách hàng, quản trị, trải nghiệm người dùng |
 
 Cả hai có thể làm chéo; người còn lại review trước khi merge.
 

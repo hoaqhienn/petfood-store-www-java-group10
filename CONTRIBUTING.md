@@ -1,6 +1,6 @@
 # Làm việc nhóm
 
-Hoàng Hiện chủ đạo backend, Minh Anh chủ đạo frontend. Có thể đổi vai trò theo task; thống nhất API trước để tránh chặn nhau.
+Hoàng Hiện chủ đạo backend, Anh Minh chủ đạo frontend. Có thể đổi vai trò theo task; thống nhất API trước để tránh chặn nhau.
 
 1. Lấy `main` mới nhất và tạo nhánh `feat/<ten-chuc-nang>`, `fix/<loi>` hoặc `docs/<noi-dung>`.
 2. Thay đổi nhỏ, có mục tiêu rõ; không sửa đồng thời nhiều module không liên quan.

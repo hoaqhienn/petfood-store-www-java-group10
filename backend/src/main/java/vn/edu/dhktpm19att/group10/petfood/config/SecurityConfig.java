@@ -1,4 +1,4 @@
-package vn.edu.dhktpm19at.group10.petfood.config;
+package vn.edu.dhktpm19att.group10.petfood.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

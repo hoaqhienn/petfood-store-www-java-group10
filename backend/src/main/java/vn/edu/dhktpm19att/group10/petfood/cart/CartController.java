@@ -1,4 +1,4 @@
-package vn.edu.dhktpm19at.group10.petfood.cart;
+package vn.edu.dhktpm19att.group10.petfood.cart;
 
 import java.math.BigDecimal;
 import java.util.LinkedHashMap;
@@ -15,7 +15,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
-import vn.edu.dhktpm19at.group10.petfood.catalog.CatalogQueries;
+import vn.edu.dhktpm19att.group10.petfood.catalog.CatalogQueries;
 
 @RestController
 @RequestMapping("/api/v1")

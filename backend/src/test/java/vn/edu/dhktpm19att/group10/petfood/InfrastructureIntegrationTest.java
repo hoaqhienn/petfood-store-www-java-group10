@@ -1,4 +1,4 @@
-package vn.edu.dhktpm19at.group10.petfood;
+package vn.edu.dhktpm19att.group10.petfood;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Tag;
