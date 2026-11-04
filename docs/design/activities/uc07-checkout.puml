@@ -14,7 +14,8 @@ else (Có)
 endif
 :Đọc giỏ và lập báo giá từ DB;
 if (Giỏ hợp lệ và dịch vụ sẵn sàng?) then (Không)
-  :Báo lỗi; giữ giỏ;
+  :Báo lỗi; giữ giỏ.
+  Dependency không khả dụng: 503;
   stop
 else (Có)
 endif
@@ -48,6 +49,11 @@ if (Đã có kết quả?) then (Có)
 else (Không)
 endif
 :Kiểm tra quote/revision/giá;
+if (Redis hoặc PostgreSQL không khả dụng?) then (Có)
+  :503 DEPENDENCY_UNAVAILABLE; giữ giỏ;
+  stop
+else (Không)
+endif
 if (Báo giá và giỏ còn hợp lệ?) then (Không)
   :409; yêu cầu xem lại báo giá;
   stop
@@ -59,7 +65,8 @@ note right
   UNIQUE + locking: request cạnh tranh
   phải trả cùng kết quả hoặc conflict.
 end note
-:Khóa và kiểm tra lại loại/SKU/tồn;
+:Khóa danh mục theo ID, rồi SKU theo ID;
+:Đọc lại liên kết danh mục, trạng thái, giá và tồn;
 if (Tất cả dòng đủ điều kiện?) then (Không)
   :Rollback; giữ giỏ;
   stop
@@ -69,7 +76,9 @@ endif
 dòng snapshot, trừ tồn,
 movement, history, key và outbox;
 if (Commit thành công?) then (Không)
-  :Rollback; báo lỗi có thể retry;
+  :Rollback nếu biết giao dịch thất bại;
+  :Nếu chưa rõ kết quả commit, tra receipt
+  hoặc retry cùng body/key;
   stop
 else (Có)
 endif

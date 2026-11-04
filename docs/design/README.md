@@ -2,7 +2,7 @@
 
 **Đã bổ sung:** [8 Activity Diagram có nguồn và SVG](activities/README.md) cho P0: COD, đăng ký/login, giỏ, sửa/trạng thái đơn, xóa dữ liệu và email nền. Các giả định nghiệp vụ được đánh dấu, chưa phải chức năng đã lập trình.
 
-Nguồn Use Case Diagram: [use-cases.puml](use-cases.puml), liên kết [đặc tả UC01–UC23](../USE_CASES.md). GitHub không render PlantUML trực tiếp; mở nguồn bằng công cụ PlantUML trong IDE hoặc xuất SVG khi chuẩn bị báo cáo. Nguồn chưa được render/kiểm chứng hình ảnh trong lần cập nhật này.
+Xem [Use Case Diagram SVG](use-cases.svg), [nguồn PlantUML](use-cases.puml) và [đặc tả UC01–UC23](../USE_CASES.md).
 
 Bản đồ dưới đây dùng Mermaid để đọc ngay trên GitHub; **đây là bản đồ chức năng, không thay thế ký pháp UML use case**. Các nhóm chỉ để trình bày; sơ đồ PlantUML liệt kê đủ từng UC và quan hệ kế thừa actor.
 
@@ -26,4 +26,4 @@ Không dùng include/extend để biểu diễn thứ tự trang hoặc điều 
 
 [Domain Class Diagram và ERD P0](domain-erd.md) mô tả quan hệ nghiệp vụ, ranh giới Redis/PostgreSQL và các khóa bảo vệ luồng COD. Chi tiết thuộc tính nằm trong [DOMAIN_MODEL.md](../DOMAIN_MODEL.md).
 
-[Sequence Diagram UC07](sequences/README.md) mô tả preview, replay, transaction và dọn giỏ sau commit.
+[Sequence Diagram](sequences/README.md) mô tả checkout COD, đăng ký khi SMTP lỗi và hai admin sửa cùng đơn. [Design Class Diagram](design-class.md) mô tả trách nhiệm các lớp cho ba luồng.

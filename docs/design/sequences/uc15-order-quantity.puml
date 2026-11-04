@@ -1,0 +1,33 @@
+@startuml
+title UC15 — Hai admin sửa cùng đơn
+actor "Admin A" as A
+actor "Admin B" as B
+participant "Admin Order API" as API
+database PostgreSQL as DB
+A -> API : Sửa số lượng với version v
+B -> API : Sửa cùng đơn với version v
+note over API : Kiểm tra admin ACTIVE, CSRF và input cho từng request.
+group Transaction A lấy khóa trước
+  API -> DB : Khóa hàng đơn, đọc version và trạng thái
+  API -> DB : Khóa danh mục rồi SKU theo ID tăng dần
+  API -> DB : Kiểm tra trạng thái và delta tồn
+  alt Đủ điều kiện
+    API -> DB : Cập nhật tồn, movement, quantity, tổng theo giá snapshot
+    API -> DB : Ghi lịch sử, tăng version, COMMIT
+    API --> A : 200, version mới
+  else Không đủ điều kiện
+    API -> DB : ROLLBACK
+    API --> A : Lỗi nghiệp vụ
+  end
+end
+group Transaction B đọc sau khi lấy được khóa đơn
+  API -> DB : Đọc version và trạng thái hiện hành
+  alt Version đã đổi
+    API -> DB : ROLLBACK
+    API --> B : 409 VERSION_CONFLICT
+  else Version vẫn là v
+    API -> DB : Kiểm tra và áp dụng cùng quy trình như A
+    API --> B : Kết quả của transaction B
+  end
+end
+@enduml
