@@ -85,6 +85,9 @@ compose.yaml
 
 ## Tài liệu và thành viên
 
+- [Danh mục và đặc tả use case](docs/USE_CASES.md)
+- [Use Case Diagram và lộ trình UML](docs/design/README.md)
+
 - [Hướng dẫn phát triển local và xử lý lỗi](docs/LOCAL_DEVELOPMENT.md)
 - [Kiến trúc và quyết định kỹ thuật](docs/ARCHITECTURE.md)
 - [Yêu cầu môn học và phạm vi](docs/REQUIREMENTS.md)
