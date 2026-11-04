@@ -1,4 +1,4 @@
-package vn.edu.dhktpm19at.group10.petfood.catalog;
+package vn.edu.dhktpm19att.group10.petfood.catalog;
 
 import java.math.BigDecimal;
 import java.util.List;

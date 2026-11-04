@@ -1,11 +1,11 @@
-package vn.edu.dhktpm19at.group10.petfood.system;
+package vn.edu.dhktpm19att.group10.petfood.system;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MockMvc;
-import vn.edu.dhktpm19at.group10.petfood.config.SecurityConfig;
+import vn.edu.dhktpm19att.group10.petfood.config.SecurityConfig;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;

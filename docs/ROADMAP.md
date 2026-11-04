@@ -13,7 +13,7 @@ Rà soát sau bản phân tích: dùng thêm CONSTRAINTS.md và AC31–AC36. T02
 
 Owner là người chủ đạo; người còn lại review và có thể nhận task chéo. Mỗi dòng nên thành một hoặc vài PR nhỏ; bảng chưa tự tạo GitHub issues hay giao việc bên ngoài.
 
-| Task | Mốc mục tiêu | Hoàng Hiện | Minh Anh | Phụ thuộc / nghiệm thu |
+| Task | Mốc mục tiêu | Hoàng Hiện | Anh Minh | Phụ thuộc / nghiệm thu |
 |---|---|---|---|---|
 | T01 Review nghiệp vụ, ERD/API | 03–04/11 | Dữ liệu, transaction | Màn hình, error states | Chốt D01–D08; thống nhất API_CONTRACT |
 | T02 Identity + Session | 04–07/11 | Migration user, register/login, CSRF, quyền | Form tài khoản, API client, bảo vệ route | T01; AC05–08 |
@@ -29,7 +29,7 @@ Owner là người chủ đạo; người còn lại review và có thể nhận
 
 ## Tổng quan mốc ban đầu
 
-| Mốc | Hoàng Hiện chủ đạo | Minh Anh chủ đạo | Kết quả |
+| Mốc | Hoàng Hiện chủ đạo | Anh Minh chủ đạo | Kết quả |
 |---|---|---|---|
 | 01–07/11 | Schema, xác thực Session, catalog API | Layout, catalog, trang tài khoản | Đăng ký/đăng nhập và xem sản phẩm |
 | 08–14/11 | Giỏ hàng, COD, email, CRUD admin | Giỏ hàng, checkout, màn hình quản trị | Luồng mua hàng theo đề bài |

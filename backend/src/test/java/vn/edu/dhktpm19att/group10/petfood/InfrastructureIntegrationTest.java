@@ -1,11 +1,13 @@
-package vn.edu.dhktpm19at.group10.petfood;
+package vn.edu.dhktpm19att.group10.petfood;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.session.Session;
@@ -13,6 +15,9 @@ import org.springframework.session.SessionRepository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -23,6 +28,54 @@ class InfrastructureIntegrationTest {
     @Autowired JdbcTemplate jdbc;
     @Autowired SessionRepository<? extends Session> sessions;
     @Autowired MockMvc mvc;
+    @Autowired ObjectMapper json;
+
+    @Test
+    @Transactional
+    void guestCartUsesRedisSessionAndRejectsStaleMutations() throws Exception {
+        Long category = jdbc.queryForObject("""
+                INSERT INTO category (name, slug, status) VALUES ('Cart', 'cart-test', 'ACTIVE') RETURNING id
+                """, Long.class);
+        long product = insertProduct(category, "CART-TEST-1", "ACTIVE");
+        jdbc.update("UPDATE product SET available_stock = 8 WHERE id = ?", product);
+
+        var first = mvc.perform(get("/api/v1/cart"))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.revision").value(0)).andReturn();
+        var session = first.getResponse().getCookie("SESSION");
+        assertThat(session).isNotNull();
+        var csrfResponse = mvc.perform(get("/api/v1/auth/csrf").cookie(session))
+                .andExpect(status().isOk()).andReturn();
+        var csrf = json.readTree(csrfResponse.getResponse().getContentAsString());
+        String header = csrf.get("headerName").asText();
+        String token = csrf.get("token").asText();
+        String add = """
+                {"productId":"%d","quantity":2,"expectedRevision":0}
+                """.formatted(product);
+        mvc.perform(post("/api/v1/cart/items").cookie(session).contentType(MediaType.APPLICATION_JSON).content(add))
+                .andExpect(status().isForbidden());
+        mvc.perform(post("/api/v1/cart/items").cookie(session).header(header, token)
+                        .contentType(MediaType.APPLICATION_JSON).content(add))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.revision").value(1))
+                .andExpect(jsonPath("$.subtotal").value("56000"));
+        mvc.perform(post("/api/v1/cart/items").cookie(session).header(header, token)
+                        .contentType(MediaType.APPLICATION_JSON).content(add))
+                .andExpect(status().isConflict()).andExpect(jsonPath("$.code").value("CART_CHANGED"));
+        mvc.perform(get("/api/v1/cart").cookie(session))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.items[0].quantity").value(2));
+        mvc.perform(get("/api/v1/cart"))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.items").isEmpty());
+        mvc.perform(patch("/api/v1/cart/items/{id}", product).cookie(session).header(header, token)
+                        .contentType(MediaType.APPLICATION_JSON).content("""
+                                {"quantity":3,"expectedRevision":1}
+                                """))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.items[0].quantity").value(3));
+        mvc.perform(delete("/api/v1/cart/items/{id}", product).cookie(session).header(header, token)
+                        .param("expectedRevision", "2"))
+                .andExpect(status().isNoContent());
+        mvc.perform(get("/api/v1/cart").cookie(session))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.revision").value(3))
+                .andExpect(jsonPath("$.items").isEmpty());
+    }
 
     @Test
     @Transactional

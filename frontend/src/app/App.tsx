@@ -67,7 +67,7 @@ export function App() {
         {isAdmin && <p className="notice">Đây là trang giữ chỗ công khai, chưa có dữ liệu hoặc thao tác quản trị. Phân quyền admin sẽ được triển khai cùng đăng nhập.</p>}
         </>}
       </main>
-      <footer><span>petfood — Good food. Happy pets.</span><span>DHKTPM19AT · Nhóm 10 · Đề tài 42</span></footer>
+      <footer><span>petfood — Good food. Happy pets.</span><span>DHKTPM19ATT · Nhóm 10 · Đề tài 42</span></footer>
     </>
   );
 }

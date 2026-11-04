@@ -1,4 +1,4 @@
-package vn.edu.dhktpm19at.group10.petfood.system;
+package vn.edu.dhktpm19att.group10.petfood.system;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
