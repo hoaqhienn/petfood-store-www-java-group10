@@ -1,6 +1,6 @@
 # Hợp đồng API dự thảo — 03/11/2026
 
-Đã triển khai GET `/api/v1/info`, `/actuator/health` và ba route đọc catalog bên dưới. Các route nghiệp vụ khác là hợp đồng dự thảo. Gốc nghiệp vụ `/api/v1`; Session cookie HttpOnly và CSRF cho mutation. Frontend gọi qua same-origin proxy.
+Đã triển khai GET `/api/v1/info`, `/actuator/health`, các route catalog, CSRF và giỏ Session. Các route nghiệp vụ khác là hợp đồng dự thảo. Gốc nghiệp vụ `/api/v1`. Frontend gọi qua same-origin proxy và gửi cookie Session cùng CSRF cho mutation.
 
 ## Quy ước
 
@@ -34,6 +34,8 @@
 | POST /cart/items | Public Session | productId, quantity, expectedRevision; cộng số lượng theo BR10 |
 | PATCH /cart/items/{productId} | Public Session | quantity tuyệt đối, expectedRevision |
 | DELETE /cart/items/{productId}?expectedRevision=… | Public Session | Xóa dòng, 204; revision stale trả 409 |
+
+Khởi tạo phiên bằng GET `/cart` và GET `/auth/csrf` tuần tự trước khi gửi mutation. Gửi token CSRF theo `headerName` trả về. POST/PATCH trả giỏ mới, cùng cấu trúc GET. Mỗi dòng gồm `productId`, `quantity`, `name`, `unitPrice`, `availableStock` và `availabilityError` (null khi mua được). Dòng bị ẩn hoặc xóa vẫn có thể xóa khỏi giỏ, với tên/giá/tồn là null và không tính vào subtotal. Dòng thiếu tồn vẫn có giá hiện hành và được đánh dấu lỗi. Khi nhận `409 CART_CHANGED`, đọc lại giỏ trước khi người dùng xác nhận thao tác tiếp theo.
 | POST /checkout/preview | Customer | cartRevision; báo giá, quoteToken và expiresAt; không giữ hàng |
 | POST /orders | Customer | Idempotency-Key header + cartToken/cartRevision,quoteToken,recipient,paymentMethod=COD |
 | GET /orders | Customer | Chỉ đơn của actor, phân trang |

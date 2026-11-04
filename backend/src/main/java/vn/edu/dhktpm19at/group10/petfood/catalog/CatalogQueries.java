@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Repository
-class CatalogQueries {
+public class CatalogQueries {
     private static final String VISIBLE = """
             FROM product p JOIN category c ON c.id = p.category_id
             WHERE p.status = 'ACTIVE' AND c.status = 'ACTIVE'
@@ -41,9 +41,16 @@ class CatalogQueries {
                 """, (rs, row) -> new Category(rs.getString("id"), rs.getString("name"), rs.getString("slug")));
     }
 
-    Optional<Product> product(long id) {
+    public Optional<Product> product(long id) {
         return jdbc.query(FIELDS + VISIBLE + " AND p.id = :id",
                 new MapSqlParameterSource("id", id), PRODUCT).stream().findFirst();
+    }
+
+    public java.util.Map<String, Product> productsByIds(List<Long> ids) {
+        if (ids.isEmpty()) return java.util.Map.of();
+        return jdbc.query(FIELDS + VISIBLE + " AND p.id IN (:ids)",
+                new MapSqlParameterSource("ids", ids), PRODUCT).stream()
+                .collect(java.util.stream.Collectors.toMap(Product::id, product -> product));
     }
 
     @Transactional(readOnly = true, isolation = Isolation.REPEATABLE_READ)
@@ -83,7 +90,7 @@ class CatalogQueries {
     }
 
     record Category(String id, String name, String slug) {}
-    record Product(String id, String sku, String name, String description, String species, String lifeStage,
+    public record Product(String id, String sku, String name, String description, String species, String lifeStage,
             String brand, int weightGrams, String price, int availableStock, String imageUrl,
             String categoryId, String categoryName) {}
     record ProductPage(List<Product> items, int page, int size, long totalElements, long totalPages) {}

@@ -14,6 +14,10 @@ public class SecurityConfig {
         http.authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.GET, "/api/v1/info", "/actuator/health").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/categories", "/api/v1/products", "/api/v1/products/{id}").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/cart", "/api/v1/auth/csrf").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/v1/cart/items").permitAll()
+                .requestMatchers(HttpMethod.PATCH, "/api/v1/cart/items/{id}").permitAll()
+                .requestMatchers(HttpMethod.DELETE, "/api/v1/cart/items/{id}").permitAll()
                 .anyRequest().denyAll());
         return http.build();
     }
