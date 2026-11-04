@@ -1,0 +1,63 @@
+@startuml
+title UC09 / UC16 — Hủy và xử lý trạng thái đơn COD
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+|Chủ đơn / Admin|
+start
+:Chọn thao tác, gửi version/lý do;
+|PetFood API|
+:Kiểm tra ACTIVE, CSRF;
+if (Admin hoặc chủ đơn hợp lệ?) then (Không)
+  :Từ chối; không tiết lộ dữ liệu khác;
+  stop
+else (Có)
+endif
+|Transaction PostgreSQL|
+:Khóa đơn; kiểm tra version;
+if (Version khớp?) then (Không)
+  :Rollback; 409, không hoàn tồn;
+  stop
+else (Có)
+endif
+if (Yêu cầu hủy?) then (Có)
+  if (Chủ đơn: PENDING; Admin: PENDING/CONFIRMED?) then (Có)
+    :Khóa các SKU theo thứ tự;
+    :Hoàn quantity hiện tại đúng một lần;
+    :Đặt CANCELLED/UNPAID;
+  else (Không)
+    :Từ chối; đơn đã hủy không hoàn thêm;
+    stop
+  endif
+else (Chuyển tiếp)
+  if (Actor là Admin?) then (Không)
+    :Từ chối;
+    stop
+  else (Có)
+  endif
+  if (PENDING -> CONFIRMED?) then (Có)
+    :Xác nhận đơn;
+  elseif (CONFIRMED -> SHIPPING?) then (Có)
+    :Ghi bàn giao hàng;
+  elseif (SHIPPING -> COMPLETED và codReceived=true?) then (Có)
+    :Đặt COMPLETED, PAID, paidAt;
+  else (Không)
+    :Từ chối nhảy/quay lui hoặc thiếu xác nhận COD;
+    stop
+  endif
+endif
+:Ghi version, lịch sử/movement nếu có;
+if (Commit thành công?) then (Không)
+  :Rollback toàn bộ;
+  stop
+else (Có)
+endif
+|Chủ đơn / Admin|
+:Nhận trạng thái mới;
+stop
+legend
+  D02–D04 là giả định; trừ tồn đã diễn ra ở UC07.
+  Xác nhận/giao/hoàn thành không trừ tồn lần nữa.
+  Chưa có trả hàng/hoàn tiền/giao thất bại tự động.
+  BR16–18; AC15,17,20.
+endlegend
+@enduml

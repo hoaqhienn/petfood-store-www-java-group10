@@ -1,0 +1,60 @@
+@startuml
+title UC02 — Xem và thay đổi giỏ Session
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+|Người truy cập|
+start
+:Mở giỏ hoặc chọn thêm/sửa/xóa;
+|PetFood API|
+:Đọc Session và revision;
+if (Redis khả dụng?) then (Không)
+  :Báo lỗi; không tạo giỏ thay thế;
+  stop
+else (Có)
+endif
+if (Chỉ xem giỏ?) then (Có)
+  :Đọc giá/khả dụng từ DB;
+  :Trả giỏ; đánh dấu SKU không mua được;
+  stop
+else (Không)
+endif
+:Kiểm tra CSRF và request;
+if (Request hợp lệ?) then (Không)
+  :Từ chối; giữ giỏ;
+  stop
+else (Có)
+endif
+if (Xóa dòng?) then (Có)
+  :Xác định dòng cần xóa;
+else (Thêm / sửa)
+  :Kiểm tra quantity và giới hạn giỏ;
+  :Kiểm tra SKU/loại ACTIVE và tồn;
+  if (Đủ điều kiện?) then (Không)
+    :Trả lỗi; giữ giỏ;
+    stop
+  else (Có)
+  endif
+endif
+|Session / Redis|
+:So expectedRevision và cập nhật
+nguyên tử, tăng revision;
+if (Revision cũ hoặc ghi lỗi?) then (Có)
+  :Không ghi đè; 409 hoặc lỗi dịch vụ;
+  |Frontend|
+  :Hiển thị lỗi và tải lại khi khả dụng;
+  stop
+else (Không)
+endif
+|PetFood API|
+:Trả kết quả; DELETE dùng 204;
+|Frontend|
+:Cập nhật giỏ;
+:Sau DELETE đọc lại giỏ/revision;
+stop
+legend
+  Không giữ/trừ tồn, không có bảng giỏ PostgreSQL.
+  CSRF sai luôn từ chối trước mutation.
+  D08: 50 SKU, 1–99/dòng là đề xuất.
+  BR10,14; AC03–04,31.
+endlegend
+@enduml

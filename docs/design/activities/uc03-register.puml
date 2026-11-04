@@ -1,0 +1,45 @@
+@startuml
+title UC03 — Đăng ký
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+|Guest|
+start
+:Nhập tên, email và mật khẩu;
+:Gửi đăng ký;
+|PetFood API|
+:Kiểm tra CSRF, DTO whitelist,
+chuẩn hóa email và validate;
+if (Hợp lệ?) then (Không)
+  :Trả lỗi trường; không tạo tài khoản;
+  stop
+else (Có)
+endif
+:Băm mật khẩu;
+|Transaction PostgreSQL|
+:Tạo CUSTOMER ACTIVE
+và outbox REGISTRATION;
+if (Email vi phạm UNIQUE?) then (Có)
+  :Rollback; EMAIL_EXISTS;
+  stop
+else (Không)
+endif
+if (Commit thành công?) then (Không)
+  :Rollback; báo thất bại;
+  stop
+else (Có)
+endif
+|PetFood API|
+:201; thông báo tạo tài khoản,
+email đang chờ gửi;
+note right
+  Không trả password/hash; không tự login.
+  Worker gửi email sau commit theo AD08.
+end note
+|Guest|
+:Chuyển sang đăng nhập nếu muốn;
+stop
+legend
+  Giả định D06: chưa bắt buộc xác minh email để mua.
+  BR05–06,19–20; AC05–06,21,33.
+endlegend
+@enduml
