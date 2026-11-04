@@ -39,6 +39,7 @@ services:
       DB_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-petfood}
       DB_USERNAME: ${POSTGRES_USER:-petfood}
       DB_PASSWORD: ${POSTGRES_PASSWORD:-petfood_local_only}
+      SPRING_FLYWAY_LOCATIONS: ${PETFOOD_FLYWAY_LOCATIONS:-classpath:db/migration}
       REDIS_HOST: redis
       REDIS_PORT: 6379
       MAIL_HOST: ${MAIL_HOST:-mailpit}

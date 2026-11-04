@@ -1,20 +1,25 @@
 import { useEffect, useState } from 'react';
 import { getProjectInfo } from '../shared/api';
+import { ProductDetail, ProductList } from '../features/catalog/Catalog';
 
 const repo = 'https://github.com/hoaqhienn/petfood-store-www-java-group10';
 
 export function App() {
   const [connection, setConnection] = useState('Đang kiểm tra kết nối API…');
   const isAdmin = window.location.pathname === '/admin' || window.location.pathname.startsWith('/admin/');
+  const catalogPath = window.location.pathname.replace(/\/$/, '');
+  const productRoute = /^\/products\/([^/]+)$/.exec(catalogPath);
+  const isCatalog = catalogPath === '/products' || productRoute !== null;
 
   useEffect(() => {
+    if (isCatalog) return;
     const controller = new AbortController();
     const timeout = window.setTimeout(() => controller.abort(), 8000);
     getProjectInfo(controller.signal)
       .then((info) => setConnection(`API đã kết nối · v${info.version}`))
       .catch(() => setConnection('API chưa sẵn sàng · xem hướng dẫn khởi động trong README'));
     return () => { window.clearTimeout(timeout); controller.abort(); };
-  }, []);
+  }, [isCatalog]);
 
   return (
     <>
@@ -22,12 +27,14 @@ export function App() {
       <header className="site-header">
         <a className="wordmark" href="/" aria-label="PetFood trang chủ">petfood<span>·</span></a>
         <nav aria-label="Điều hướng chính">
-          <a href="/" aria-current={!isAdmin ? 'page' : undefined}>Giới thiệu</a>
+          <a href="/" aria-current={!isAdmin && !isCatalog ? 'page' : undefined}>Giới thiệu</a>
+          <a href="/products" aria-current={isCatalog ? 'page' : undefined}>Sản phẩm</a>
           <a href="/admin" aria-current={isAdmin ? 'page' : undefined}>Quản trị</a>
           <a href={`${repo}#readme`} target="_blank" rel="noreferrer">Tài liệu ↗</a>
         </nav>
       </header>
       <main id="main">
+        {isCatalog ? (productRoute ? <ProductDetail id={productRoute[1]} /> : <ProductList />) : <>
         <section className="hero">
           <div>
             <p className="eyebrow">PETFOOD / PROJECT STARTER</p>
@@ -36,6 +43,7 @@ export function App() {
               ? 'Không gian quản trị đang được xây dựng. Sản phẩm, tài khoản và đơn hàng sẽ được quản lý tại đây.'
               : 'Mua thức ăn cho chó mèo, đơn giản hơn mỗi ngày. Chúng tôi đang xây dựng trải nghiệm chọn đúng món và đặt hàng thuận tiện.'}</p>
             <div className="actions">
+              {!isAdmin && <a className="button" href="/products">Xem sản phẩm</a>}
               <a className="button" href={`${repo}/blob/main/docs/LOCAL_DEVELOPMENT.md`} target="_blank" rel="noreferrer">Hướng dẫn chạy dự án <span>↗</span></a>
               <a className="text-link" href="#roadmap">Xem lộ trình ↓</a>
             </div>
@@ -57,6 +65,7 @@ export function App() {
           </div>
         </section>
         {isAdmin && <p className="notice">Đây là trang giữ chỗ công khai, chưa có dữ liệu hoặc thao tác quản trị. Phân quyền admin sẽ được triển khai cùng đăng nhập.</p>}
+        </>}
       </main>
       <footer><span>petfood — Good food. Happy pets.</span><span>DHKTPM19AT · Nhóm 10 · Đề tài 42</span></footer>
     </>

@@ -13,6 +13,7 @@ public class SecurityConfig {
         // No login/admin API yet. Keep CSRF enabled and deny unfinished routes.
         http.authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.GET, "/api/v1/info", "/actuator/health").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/categories", "/api/v1/products", "/api/v1/products/{id}").permitAll()
                 .anyRequest().denyAll());
         return http.build();
     }

@@ -3,3 +3,10 @@
 @media(max-width:760px){.site-header,main,footer{width:calc(100% - 36px)}.site-header{gap:20px}nav{gap:14px;font-size:12px}.wordmark{font-size:25px}.hero{grid-template-columns:1fr;gap:35px;padding:46px 0}.project-card{min-height:300px}.cards{grid-template-columns:1fr}.cards p{min-height:0}.actions{flex-wrap:wrap;gap:18px}footer{flex-direction:column;gap:5px}h1{letter-spacing:-2px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 
+.catalog h1 { font-size: clamp(2rem, 5vw, 3.5rem); }
+.catalog-search { margin: 1.5rem 0; }
+.catalog-search label { display: block; margin-bottom: .5rem; }
+.catalog-search div, .catalog-pagination { display: flex; gap: .75rem; }
+.catalog-search input { min-width: 0; width: min(100%, 24rem); }
+.catalog-search input, .catalog button { font: inherit; padding: .5rem .75rem; }
+.catalog-pagination { margin-top: 1.5rem; }

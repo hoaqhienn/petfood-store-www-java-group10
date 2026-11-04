@@ -1,6 +1,6 @@
 # Hợp đồng API dự thảo — 03/11/2026
 
-**Chưa triển khai** các route dưới đây, trừ GET `/api/v1/info` và `/actuator/health`. Đây là hợp đồng để hai thành viên chia việc, chưa phải OpenAPI hoàn chỉnh. Gốc nghiệp vụ `/api/v1`; Session cookie HttpOnly và CSRF cho mutation. Frontend gọi qua same-origin proxy.
+Đã triển khai GET `/api/v1/info`, `/actuator/health` và ba route đọc catalog bên dưới. Các route nghiệp vụ khác là hợp đồng dự thảo. Gốc nghiệp vụ `/api/v1`; Session cookie HttpOnly và CSRF cho mutation. Frontend gọi qua same-origin proxy.
 
 ## Quy ước
 
@@ -16,7 +16,7 @@
 
 | Method / route | Quyền | Dữ liệu / kết quả chính |
 |---|---|---|
-| GET /products | Public | q, categoryId, species, lifeStage, minPrice, maxPrice, page, size, sort; chỉ ACTIVE hợp lệ |
+| GET /products | Public | q tìm theo tên/SKU, categoryId, species, lifeStage, minPrice, maxPrice, page, size. Sort: name,asc (mặc định), name,desc, price,asc, price,desc. Sản phẩm và danh mục phải ACTIVE. |
 | GET /products/{id} | Public | Chi tiết, availableStock, metadata đã duyệt; không thấy sản phẩm ẩn |
 | GET /categories | Public | Loại ACTIVE |
 | GET /auth/csrf | Public | Token/header name cho mutation; lấy lại sau login/logout |

@@ -110,3 +110,14 @@ Không sửa migration đã chạy chung trong nhóm. Thêm `V2__...sql`, `V3__.
 
 Không tự viết database function, CHECK constraint hoặc stored procedure theo yêu cầu môn học. Validation nghiệp vụ ở Java, frontend hỗ trợ thông báo; PK/FK/UNIQUE bảo vệ toàn vẹn dữ liệu.
 
+## 8. Chạy catalog với dữ liệu demo
+
+Trong PowerShell tại thư mục gốc repo:
+
+```powershell
+$env:PETFOOD_FLYWAY_LOCATIONS = 'classpath:db/migration,classpath:db/demo'
+docker compose --profile app up --build -d --wait
+```
+
+Mở `http://localhost:5173/products`. Demo có một sản phẩm còn hàng và một sản phẩm hết hàng hiển thị công khai. Một sản phẩm ẩn và một sản phẩm thuộc danh mục ẩn được tạo để kiểm tra API không công khai chúng. Chỉ bật seed trên cơ sở dữ liệu demo. Giữ cấu hình Flyway này khi chạy lại cùng cơ sở dữ liệu demo.
+
