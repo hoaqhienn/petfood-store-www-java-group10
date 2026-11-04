@@ -1,0 +1,44 @@
+@startuml
+title UC03 — Đăng ký và lỗi SMTP
+actor Guest
+participant React
+participant "Account API" as API
+database PostgreSQL as DB
+participant "Outbox Worker" as Worker
+participant SMTP
+Guest -> React : Gửi thông tin đăng ký
+React -> API : POST /auth/register
+API -> API : Validate, chuẩn hóa email, băm mật khẩu
+alt Input không hợp lệ
+  API --> React : Lỗi validation
+else Input hợp lệ
+  group Transaction đăng ký
+    API -> DB : INSERT tài khoản CUSTOMER ACTIVE
+    alt Email trùng, kể cả hai request đồng thời
+      API -> DB : ROLLBACK
+      API --> React : 409 EMAIL_EXISTS
+    else Email duy nhất
+      API -> DB : Ghi outbox REGISTRATION
+      alt Ghi và commit thành công
+        API -> DB : COMMIT
+        API --> React : 201, email đang chờ
+      else Ghi thất bại
+        API -> DB : ROLLBACK
+        API --> React : Lỗi, không báo đăng ký thành công
+      end
+    end
+  end
+end
+== Sau commit ==
+Worker -> DB : Nhận sự kiện đến hạn, kiểm tra tài khoản còn tồn tại
+alt Tài khoản đã xóa
+  Worker -> DB : Hủy sự kiện
+else Tài khoản còn tồn tại
+  Worker -> SMTP : Gửi thông báo, không chứa mật khẩu
+  alt SMTP xác nhận
+    Worker -> DB : SENT
+  else SMTP lỗi
+    Worker -> DB : Hẹn retry hoặc FAILED khi hết lượt
+  end
+end
+@enduml

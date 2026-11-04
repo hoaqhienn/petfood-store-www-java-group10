@@ -117,6 +117,7 @@ erDiagram
   CATEGORY {
     bigint id PK
     text slug UK
+    text status
     bigint version
   }
   PRODUCT {
@@ -124,6 +125,7 @@ erDiagram
     bigint category_id FK
     text sku UK
     numeric price
+    text status
     int available_stock
     bigint version
   }
@@ -134,6 +136,9 @@ erDiagram
     text status
     text payment_method
     text payment_status
+    text recipient_name
+    text phone
+    text address_text
     numeric subtotal
     numeric shipping_fee
     numeric grand_total

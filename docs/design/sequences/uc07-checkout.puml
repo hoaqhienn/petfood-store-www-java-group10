@@ -36,13 +36,15 @@ else Request hợp lệ
   else Chưa có receipt
     API -> R : Đọc quote theo token và giỏ Session
     API -> API : Kiểm tra chủ quote, TTL, token và revision
-    alt Quote/giỏ không hợp lệ
+    alt Redis hoặc PostgreSQL không khả dụng
+      API --> UI : 503 DEPENDENCY_UNAVAILABLE
+    else Quote/giỏ không hợp lệ
       API -> DB : Tra lại actor + key trước khi trả lỗi
       API --> UI : Kết quả replay nếu đã commit\nNếu chưa: lỗi quote/giỏ
     else Quote/giỏ hợp lệ
       group Một transaction PostgreSQL
-        API -> DB : BEGIN và khóa SKU theo thứ tự ID
-        API -> DB : Kiểm tra lại giá, khả năng bán, tồn
+        API -> DB : BEGIN, khóa danh mục theo ID rồi SKU theo ID
+        API -> DB : Đọc lại danh mục, liên kết SKU, giá, trạng thái, tồn
         alt Tất cả dòng hợp lệ
           API -> DB : Ghi đơn PENDING/UNPAID và dòng snapshot
           API -> DB : Ghi receipt với hai khóa UNIQUE chống trùng

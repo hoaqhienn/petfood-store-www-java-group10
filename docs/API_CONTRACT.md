@@ -79,7 +79,7 @@ Mọi route dưới đây yêu cầu ADMIN ACTIVE.
 | POST /admin/orders/{id}/transitions | toStatus,reason,version; COMPLETED thêm codReceived=true; không nhảy trạng thái |
 | GET /admin/notifications; POST /admin/notifications/{id}/retry | Xem trạng thái/lỗi đã che dữ liệu; retry FAILED, không tạo lại đơn/user |
 
-Đề xuất bổ sung điều chỉnh tồn có lý do thay cho ghi đè stock từ form sản phẩm; chỉ đưa vào P0 sau review. Khóa order rồi SKU theo thứ tự ID để thống nhất luồng checkout/sửa/hủy. Version không thay thế transaction.
+Đề xuất bổ sung điều chỉnh tồn có lý do thay cho ghi đè stock từ form sản phẩm; chỉ đưa vào P0 sau review. Với thao tác sửa đơn, khóa order trước. Các luồng cần kiểm tra cả danh mục và SKU khóa danh mục theo ID tăng dần, rồi SKU theo ID tăng dần. Xem [thứ tự khóa catalog](design/sequences/README.md#khóa-catalog-và-ac36). Version không thay thế transaction.
 
 ## P1 — điểm mở rộng
 

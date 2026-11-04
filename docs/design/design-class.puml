@@ -1,0 +1,41 @@
+@startuml
+title Design Class Diagram — UC03, UC07 và UC15
+skinparam linetype ortho
+class AuthController
+class CheckoutController
+class AdminOrderController
+class RegistrationService
+class CheckoutService
+class OrderQuantityService
+class CheckoutTransaction
+class OutboxWorker
+interface AccountRepository
+interface OrderRepository
+interface CatalogRepository
+interface CheckoutReceiptRepository
+interface InventoryMovementRepository
+interface OutboxRepository
+interface CartSessionStore
+interface CheckoutQuoteStore
+interface MailGateway
+AuthController --> RegistrationService
+CheckoutController --> CheckoutService
+AdminOrderController --> OrderQuantityService
+RegistrationService --> AccountRepository
+RegistrationService --> OutboxRepository
+CheckoutService --> CartSessionStore
+CheckoutService --> CheckoutQuoteStore
+CheckoutService --> CheckoutReceiptRepository : replay
+CheckoutService --> CheckoutTransaction
+CheckoutTransaction --> CheckoutReceiptRepository
+CheckoutTransaction --> OrderRepository
+CheckoutTransaction --> CatalogRepository
+CheckoutTransaction --> InventoryMovementRepository
+CheckoutTransaction --> OutboxRepository
+OrderQuantityService --> OrderRepository
+OrderQuantityService --> CatalogRepository
+OrderQuantityService --> InventoryMovementRepository
+OutboxWorker --> OutboxRepository
+OutboxWorker --> AccountRepository
+OutboxWorker --> MailGateway
+@enduml
