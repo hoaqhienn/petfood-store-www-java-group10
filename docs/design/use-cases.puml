@@ -1,0 +1,73 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+actor "Người truy cập" as Visitor
+actor Guest
+actor Customer
+actor Admin
+actor SMTP
+actor "AI API" as AI
+Visitor <|-- Guest
+Visitor <|-- Customer
+Customer <|-- Admin
+rectangle PetFood {
+  usecase "UC01 Xem/tìm sản phẩm" as U1
+  usecase "UC02 Quản lý giỏ" as U2
+  usecase "UC03 Đăng ký" as U3
+  usecase "UC04 Đăng nhập" as U4
+  usecase "UC05 Đăng xuất" as U5
+  usecase "UC06 Cập nhật hồ sơ" as U6
+  usecase "UC07 Đặt COD" as U7
+  usecase "UC08 Đơn của tôi" as U8
+  usecase "UC09 Hủy đơn của tôi" as U9
+  usecase "UC10 Sản phẩm" as U10
+  usecase "UC11 Loại sản phẩm" as U11
+  usecase "UC12 Điều chỉnh tồn" as U12
+  usecase "UC13 Tài khoản" as U13
+  usecase "UC14 Tra cứu mọi đơn" as U14
+  usecase "UC15 Sửa số lượng đơn" as U15
+  usecase "UC16 Trạng thái đơn" as U16
+  usecase "UC17 Retry email" as U17
+  package "P1 - mở rộng" {
+    usecase "UC18 Hồ sơ thú cưng" as U18
+    usecase "UC19 Tìm kiếm ngữ nghĩa" as U19
+    usecase "UC20 Tư vấn AI" as U20
+    usecase "UC21 Quyền tracking" as U21
+    usecase "UC22 Gợi ý sản phẩm" as U22
+    usecase "UC23 Phân tích hành vi" as U23
+  }
+}
+Visitor -- U1
+Visitor -- U2
+Guest -- U3
+Guest -- U4
+Customer -- U5
+Customer -- U6
+Customer -- U7
+Customer -- U8
+Customer -- U9
+Admin -- U10
+Admin -- U11
+Admin -- U12
+Admin -- U13
+Admin -- U14
+Admin -- U15
+Admin -- U16
+Admin -- U17
+SMTP -- U3
+SMTP -- U7
+SMTP -- U17
+Customer -- U18
+Visitor -- U19
+Visitor -- U20
+Visitor -- U21
+Visitor -- U22
+Admin -- U23
+AI -- U19
+AI -- U20
+note bottom of U7
+  Login là tiền điều kiện.
+  Email gửi bất đồng bộ sau commit;
+  SMTP lỗi không rollback đơn.
+end note
+@enduml
