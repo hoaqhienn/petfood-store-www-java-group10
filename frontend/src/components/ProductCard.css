@@ -1,0 +1,121 @@
+.product-card {
+  min-width: 0;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  box-shadow: 0 5px 18px #153c7e08;
+  overflow: hidden;
+  transition:
+    box-shadow 0.25s,
+    transform 0.25s,
+    border-color 0.25s;
+}
+.product-card:hover {
+  border-color: #88b5f5;
+  box-shadow: 0 18px 35px #345cbd25;
+  transform: translateY(-5px);
+}
+.product-card:hover .food-pack {
+  transform: rotate(0) translateY(-3px);
+}
+.product-card__image {
+  position: relative;
+  height: 218px;
+  background: radial-gradient(circle at center, #ffffff 10%, #eaf1ff 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 18px;
+}
+.product-card__badge {
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  font-size: 9px;
+  letter-spacing: 0.6px;
+  color: #3d6597;
+  border: 1px solid #d1e1f7;
+  border-radius: 4px;
+  padding: 3px 6px;
+}
+.product-card__body {
+  padding: 17px;
+}
+.product-card__brand {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--muted);
+}
+.product-card h3 {
+  font-size: 14px;
+  font-weight: 650;
+  line-height: 1.6;
+  margin: 8px 0;
+  min-height: 45px;
+}
+.product-card h3 a:hover {
+  color: var(--primary);
+}
+.product-card__weight {
+  font-size: 11px;
+  color: var(--muted);
+  margin: 9px 0 17px;
+}
+.product-card__weight span {
+  padding: 0 6px;
+  color: #c8c9c0;
+}
+.product-card__bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  flex-direction: column;
+  gap: 12px;
+}
+.product-card__bottom strong {
+  color: var(--primary);
+  font-size: 20px;
+}
+.add-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 1px solid #1261d8;
+  width: 100%;
+  min-height: 38px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 8px;
+  color: white;
+  background: linear-gradient(110deg, #1261d8, #5751d9);
+  box-shadow: 0 4px 10px #3064d322;
+}
+.add-button:hover {
+  color: white;
+  background: #0847aa;
+}
+.add-button:disabled {
+  background: #eee;
+  color: #999;
+  border-color: #ddd;
+}
+@media (max-width: 500px) {
+  .product-card__image {
+    height: 193px;
+  }
+  .product-card__body {
+    padding: 12px;
+  }
+  .product-card__bottom strong {
+    font-size: 15px;
+  }
+  .product-card__weight {
+    font-size: 10px;
+  }
+  .product-card h3 {
+    font-size: 13px;
+    min-height: 63px;
+  }
+}

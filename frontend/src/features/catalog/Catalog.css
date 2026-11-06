@@ -1,0 +1,250 @@
+.product-section {
+  padding-top: 30px;
+}
+.section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 18px;
+}
+.eyebrow {
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 1.6px;
+  color: var(--primary);
+}
+.section-title h1,
+.section-title h2 {
+  font-size: 23px;
+  letter-spacing: -0.7px;
+  line-height: 1.4;
+  margin: 7px 0 0;
+}
+.section-title > a {
+  font-size: 10px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  white-space: nowrap;
+  color: var(--muted);
+}
+.catalog-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 16px;
+  margin-bottom: 22px;
+  gap: 12px;
+}
+.catalog-tabs {
+  display: flex;
+  gap: 8px;
+}
+.catalog-tabs a {
+  padding: 8px 17px;
+  font-size: 11px;
+  border: 1px solid var(--border);
+  background: white;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+.catalog-tabs a.active {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: white;
+}
+.sort-label {
+  display: flex;
+  align-items: center;
+  font-size: 10px;
+  gap: 7px;
+  color: var(--muted);
+}
+.sort-label select {
+  border: none;
+  background: transparent;
+  color: var(--ink);
+  font-size: 11px;
+  max-width: 135px;
+  cursor: pointer;
+  padding: 7px 0;
+}
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+.product-grid > article {
+  animation: enter 0.5s ease both;
+}
+.product-grid > article:nth-child(2) {
+  animation-delay: 0.05s;
+}
+.product-grid > article:nth-child(3) {
+  animation-delay: 0.1s;
+}
+.product-grid > article:nth-child(4) {
+  animation-delay: 0.15s;
+}
+.catalog-state {
+  padding: 65px 20px;
+  text-align: center;
+  background: white;
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+  color: var(--muted);
+}
+.catalog-state h3 {
+  color: var(--ink);
+}
+.catalog-state p {
+  font-size: 13px;
+  margin: 15px 0 25px;
+}
+.catalog-state .button {
+  margin: 5px;
+}
+.product-skeleton {
+  height: 355px;
+  background: linear-gradient(100deg, #efeee8 30%, #f4f7fc 50%, #efeee8 70%);
+  background-size: 200%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 12px;
+}
+.result-count {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 20px;
+}
+.pagination {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+.back-link {
+  font-size: 12px;
+  color: var(--muted);
+}
+.detail-page {
+  padding-top: 15px;
+}
+.detail-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  margin-top: 30px;
+  background: white;
+  padding: 36px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.detail-image {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 420px;
+  position: relative;
+  background: #f6f4ed;
+  border-radius: 10px;
+}
+.detail-image .food-pack {
+  transform: scale(1.65) rotate(-5deg);
+}
+.detail-image small {
+  position: absolute;
+  bottom: 18px;
+  font-size: 10px;
+  color: var(--muted);
+}
+.detail-image .product-photo {
+  height: 350px;
+}
+.detail-info h1 {
+  font-size: 29px;
+  line-height: 1.4;
+}
+.stock-label {
+  color: #65805b;
+  font-size: 12px;
+}
+.detail-price {
+  font-size: 28px;
+  font-weight: 750;
+  color: var(--primary);
+}
+.detail-info dl {
+  border-block: 1px solid var(--border);
+  padding: 12px 0;
+  font-size: 12px;
+}
+.detail-info dl > div {
+  display: flex;
+  gap: 20px;
+  padding: 8px 0;
+}
+.detail-info dt {
+  width: 90px;
+  color: var(--muted);
+}
+.detail-info dd {
+  margin: 0;
+}
+.detail-description {
+  font-size: 13px;
+  line-height: 1.9;
+  color: var(--muted);
+  margin-bottom: 25px;
+}
+@keyframes shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+@media (max-width: 1150px) {
+  .product-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (max-width: 800px) {
+  .detail-layout {
+    gap: 25px;
+    padding: 20px;
+  }
+  .detail-info h1 {
+    font-size: 23px;
+  }
+}
+@media (max-width: 600px) {
+  .product-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 11px;
+  }
+  .section-title h1,
+  .section-title h2 {
+    font-size: 20px;
+  }
+  .section-title > a {
+    font-size: 9px;
+  }
+  .catalog-toolbar {
+    flex-wrap: wrap;
+  }
+  .sort-label > span {
+    display: none;
+  }
+  .catalog-tabs {
+    gap: 5px;
+  }
+  .catalog-tabs a {
+    padding: 8px 12px;
+  }
+  .detail-layout {
+    grid-template-columns: 1fr;
+  }
+  .detail-image {
+    min-height: 350px;
+  }
+}
