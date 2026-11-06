@@ -1,0 +1,101 @@
+.food-pack {
+  --pack-color: #648774;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 126px;
+  height: 174px;
+  padding: 13px 10px 0;
+  background: linear-gradient(
+    100deg,
+    #e8e3d8,
+    #fffdf7 15%,
+    #f3efe4 84%,
+    #d6d0c5
+  );
+  border-radius: 6px 6px 13px 13px;
+  box-shadow:
+    5px 10px 13px #2e33251b,
+    inset 2px 0 2px #fff;
+  transform: rotate(-5deg);
+  transition: transform 0.3s;
+  overflow: hidden;
+  color: #34382e;
+}
+.pack-seal {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 7px;
+  background: repeating-linear-gradient(0deg, #d5d0c5 0 1px, #e9e4d9 1px 3px);
+}
+.pack-brand {
+  font-weight: 900;
+  font-size: 20px;
+  letter-spacing: -0.8px;
+  line-height: 1;
+}
+.pack-brand > span {
+  font-size: 8px;
+  vertical-align: top;
+}
+.pack-kitchen {
+  font-size: 6px;
+  margin-top: 4px;
+}
+.pack-art {
+  display: grid;
+  place-items: center;
+  background: color-mix(in srgb, var(--pack-color) 18%, transparent);
+  border-radius: 50%;
+  width: 61px;
+  height: 61px;
+  margin: 7px 0 4px;
+}
+.pack-art span {
+  font-size: 40px;
+}
+.pack-flavor {
+  color: var(--pack-color);
+  font-size: 12px;
+  letter-spacing: 1px;
+}
+.pack-recipe {
+  font-size: 6px;
+}
+.pack-base {
+  background: var(--pack-color);
+  color: white;
+  margin-top: auto;
+  width: calc(100% + 20px);
+  padding: 10px 10px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 7px;
+}
+.pack-base b {
+  font-size: 9px;
+}
+.food-pack--pouch {
+  height: 152px;
+  width: 116px;
+  transform: rotate(5deg);
+}
+.food-pack--pouch .pack-art {
+  height: 44px;
+  width: 44px;
+}
+.food-pack--pouch .pack-art span {
+  font-size: 31px;
+}
+.product-photo {
+  width: 85%;
+  height: 180px;
+  object-fit: contain;
+}
+.image-placeholder {
+  color: var(--muted);
+  font-size: 13px;
+  text-align: center;
+}

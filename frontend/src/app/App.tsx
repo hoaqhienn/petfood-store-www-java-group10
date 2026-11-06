@@ -1,74 +1,130 @@
-import { useEffect, useState } from 'react';
-import { getProjectInfo } from '../shared/api';
-import { ProductDetail, ProductList } from '../features/catalog/Catalog';
-
-const repo = 'https://github.com/hoaqhienn/petfood-store-www-java-group10';
+import { useEffect, useState } from "react";
+import { Header } from "../components/Header";
+import { Footer } from "../components/Footer";
+import { Sidebar } from "../components/Sidebar";
+import { Hero } from "../components/Hero";
+import { ProductListing } from "../features/catalog/ProductListing";
+import { ProductDetail } from "../features/catalog/ProductDetail";
+import { CartDrawer } from "../features/cart/CartDrawer";
+import { useCart } from "../features/cart/useCart";
+import {
+  useSessionCart,
+  CartBusyContext,
+} from "../features/cart/useSessionCart";
+import { CartPage } from "../features/cart/CartPage";
+import { Icon } from "../shared/Icon";
+import { isDemo, shopLink } from "../shared/types";
 
 export function App() {
-  const [connection, setConnection] = useState('Đang kiểm tra kết nối API…');
-  const isAdmin = window.location.pathname === '/admin' || window.location.pathname.startsWith('/admin/');
-  const catalogPath = window.location.pathname.replace(/\/$/, '');
-  const productRoute = /^\/products\/([^/]+)$/.exec(catalogPath);
-  const isCatalog = catalogPath === '/products' || productRoute !== null;
-
+  const [cartOpen, setCartOpen] = useState(false);
+  const demoCart = useCart();
+  const sessionCart = useSessionCart(!isDemo);
+  const cart = isDemo ? demoCart : sessionCart;
+  const path = window.location.pathname.replace(/\/$/, "") || "/";
+  const detail = /^\/products\/([^/]+)$/.exec(path);
+  const isAdmin = path === "/admin" || path.startsWith("/admin/");
+  const home = path === "/";
   useEffect(() => {
-    if (isCatalog) return;
-    const controller = new AbortController();
-    const timeout = window.setTimeout(() => controller.abort(), 8000);
-    getProjectInfo(controller.signal)
-      .then((info) => setConnection(`API đã kết nối · v${info.version}`))
-      .catch(() => setConnection('API chưa sẵn sàng · xem hướng dẫn khởi động trong README'));
-    return () => { window.clearTimeout(timeout); controller.abort(); };
-  }, [isCatalog]);
-
+    if (!cart.message) return;
+    const timer = window.setTimeout(cart.clearMessage, 3500);
+    return () => window.clearTimeout(timer);
+  }, [cart.message]);
   return (
-    <>
-      <a className="skip-link" href="#main">Đến nội dung chính</a>
-      <header className="site-header">
-        <a className="wordmark" href="/" aria-label="PetFood trang chủ">petfood<span>·</span></a>
-        <nav aria-label="Điều hướng chính">
-          <a href="/" aria-current={!isAdmin && !isCatalog ? 'page' : undefined}>Giới thiệu</a>
-          <a href="/products" aria-current={isCatalog ? 'page' : undefined}>Sản phẩm</a>
-          <a href="/admin" aria-current={isAdmin ? 'page' : undefined}>Quản trị</a>
-          <a href={`${repo}#readme`} target="_blank" rel="noreferrer">Tài liệu ↗</a>
-        </nav>
-      </header>
-      <main id="main">
-        {isCatalog ? (productRoute ? <ProductDetail id={productRoute[1]} /> : <ProductList />) : <>
-        <section className="hero">
-          <div>
-            <p className="eyebrow">PETFOOD / PROJECT STARTER</p>
-            <h1>{isAdmin ? <>A simple start.<br /><em>Built together.</em></> : <>Good food.<br /><em>Happy pets.</em></>}</h1>
-            <p className="intro">{isAdmin
-              ? 'Không gian quản trị đang được xây dựng. Sản phẩm, tài khoản và đơn hàng sẽ được quản lý tại đây.'
-              : 'Mua thức ăn cho chó mèo, đơn giản hơn mỗi ngày. Chúng tôi đang xây dựng trải nghiệm chọn đúng món và đặt hàng thuận tiện.'}</p>
-            <div className="actions">
-              {!isAdmin && <a className="button" href="/products">Xem sản phẩm</a>}
-              <a className="button" href={`${repo}/blob/main/docs/LOCAL_DEVELOPMENT.md`} target="_blank" rel="noreferrer">Hướng dẫn chạy dự án <span>↗</span></a>
-              <a className="text-link" href="#roadmap">Xem lộ trình ↓</a>
+    <CartBusyContext.Provider
+      value={!isDemo && (sessionCart.busy || !sessionCart.ready)}
+    >
+      <a className="skip-link" href="#main">
+        Đến nội dung chính
+      </a>
+      <Header count={cart.count} onCart={() => setCartOpen(true)} />
+      <main className="container" id="main">
+        <div className="breadcrumb">
+          <span>Trang chủ</span>
+          <span>/</span>
+          <span>
+            {home
+              ? "Cửa hàng thú cưng"
+              : isAdmin
+                ? "Quản trị"
+                : detail
+                  ? "Chi tiết sản phẩm"
+                  : path === "/cart"
+                    ? "Giỏ hàng"
+                    : "Sản phẩm"}
+          </span>
+        </div>
+        {!isDemo && sessionCart.error && path !== "/cart" && (
+          <div className="notice" role="alert">
+            {sessionCart.error}{" "}
+            <a href={shopLink("/cart")}>Kiểm tra giỏ hàng</a>
+          </div>
+        )}
+        <div className="preview-notice">
+          <span>
+            <i />
+            {isDemo
+              ? "Bản xem thử · Sản phẩm, giá và giỏ hàng là dữ liệu mẫu."
+              : "Danh mục đang lấy dữ liệu từ API Spring Boot."}
+          </span>
+          <a href={isDemo ? "/products?source=api" : "/?source=demo"}>
+            {isDemo ? "Xem dữ liệu API" : "Về bản xem thử"}{" "}
+            <Icon name="arrow" size={12} />
+          </a>
+        </div>
+        {isAdmin ? (
+          <section className="simple-page">
+            <span className="eyebrow">KHÔNG GIAN QUẢN TRỊ</span>
+            <h1>Quản lý cửa hàng</h1>
+            <p>
+              Trang quản trị chưa triển khai. Đăng nhập, phân quyền và quản lý
+              sản phẩm sẽ được thực hiện ở phần Spring Boot.
+            </p>
+            <a className="button" href={shopLink("/")}>
+              Quay về cửa hàng
+            </a>
+          </section>
+        ) : path === "/cart" && !isDemo ? (
+          <CartPage state={sessionCart} />
+        ) : detail ? (
+          <ProductDetail id={decodeURIComponent(detail[1])} onAdd={cart.add} />
+        ) : home || path === "/products" ? (
+          <div className="store-layout">
+            <Sidebar />
+            <div className="store-content">
+              {home && <Hero />}
+              <ProductListing home={home} onAdd={cart.add} />
             </div>
           </div>
-          <aside className="project-card" aria-label="Tiến độ dự án">
-            <span className="card-label">THE FIRST CHAPTER</span>
-            <div className="bowl" aria-hidden="true"><i /><i /><i /><i /><i /></div>
-            <h2>Nền tảng hôm nay.<br />Trải nghiệm ngày mai.</h2>
-            <p>Bộ khung phát triển · Tháng 11/2026</p>
-            <div className="api-status" role="status">{connection}</div>
-          </aside>
-        </section>
-        <section className="roadmap" id="roadmap" aria-labelledby="roadmap-title">
-          <div className="section-heading"><p className="eyebrow">WHAT COMES NEXT</p><h2 id="roadmap-title">Từng bước, rõ ràng.</h2></div>
-          <div className="cards">
-            <article><span>01 / NỀN TẢNG</span><h3>Sẵn sàng phát triển</h3><p>React, Spring Boot, PostgreSQL, Redis và môi trường Docker dùng chung.</p><strong>Bộ khung hiện tại</strong></article>
-            <article><span>02 / MUA SẮM</span><h3>Từ chọn món đến đặt hàng</h3><p>Danh mục, tài khoản, giỏ hàng Session, COD, email và quản trị.</p><strong>Dự kiến triển khai</strong></article>
-            <article><span>03 / CÁ NHÂN HÓA</span><h3>Hiểu bạn nhỏ hơn</h3><p>Hồ sơ thú cưng, tìm kiếm vector, tư vấn AI và phân tích hành vi.</p><strong>Dự kiến triển khai</strong></article>
-          </div>
-        </section>
-        {isAdmin && <p className="notice">Đây là trang giữ chỗ công khai, chưa có dữ liệu hoặc thao tác quản trị. Phân quyền admin sẽ được triển khai cùng đăng nhập.</p>}
-        </>}
+        ) : (
+          <section className="simple-page">
+            <h1>Trang không tồn tại</h1>
+            <a className="button" href={shopLink("/")}>
+              Về trang chủ
+            </a>
+          </section>
+        )}
       </main>
-      <footer><span>petfood — Good food. Happy pets.</span><span>DHKTPM19ATT · Nhóm 10 · Đề tài 42</span></footer>
-    </>
+      <Footer />
+      {cart.message && (
+        <div className="toast" role="status">
+          <Icon name="check" size={20} />
+          <span>{cart.message}</span>
+          <button
+            className="icon-button"
+            onClick={cart.clearMessage}
+            aria-label="Đóng thông báo"
+          >
+            <Icon name="close" size={16} />
+          </button>
+        </div>
+      )}
+      {cartOpen && isDemo && (
+        <CartDrawer
+          items={demoCart.items}
+          onClose={() => setCartOpen(false)}
+          onChange={demoCart.change}
+        />
+      )}
+    </CartBusyContext.Provider>
   );
 }
-
