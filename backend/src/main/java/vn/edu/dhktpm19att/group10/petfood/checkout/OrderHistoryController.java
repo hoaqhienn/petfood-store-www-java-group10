@@ -50,21 +50,26 @@ class OrderHistoryController {
     public ResponseEntity<?> detail(Authentication authentication, @PathVariable String id) {
         long actor = Long.parseLong(authentication.getName());
         if (!active(actor)) return locked();
+        return findDetail(id, actor);
+    }
+
+    ResponseEntity<?> findDetail(String id, Long actor) {
         if (!id.matches("(?i)[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")) return missing();
         UUID orderId = UUID.fromString(id);
+        String ownerFilter = actor == null ? "" : " AND customer_id = ?";
+        Object[] parameters = actor == null ? new Object[]{orderId} : new Object[]{orderId, actor};
         var orders = db.query("SELECT " + FIELDS + """
-                 , recipient_name, phone, address_text FROM customer_order WHERE id = ? AND customer_id = ?
-                """, (rs, row) -> new DetailHeader(summary(rs),
+                 , recipient_name, phone, address_text FROM customer_order WHERE id = ?
+                """ + ownerFilter, (rs, row) -> new DetailHeader(summary(rs),
                 new Recipient(rs.getString("recipient_name"), rs.getString("phone"), rs.getString("address_text"))),
-                orderId, actor);
+                parameters);
         if (orders.isEmpty()) return missing();
 
         var items = db.query("""
                 SELECT i.product_id, i.sku_snapshot, i.name_snapshot, i.unit_price, i.quantity, i.line_total
-                FROM order_item i JOIN customer_order o ON o.id = i.order_id
-                WHERE i.order_id = ? AND o.customer_id = ? ORDER BY i.product_id
+                FROM order_item i WHERE i.order_id = ? ORDER BY i.product_id
                 """, (rs, row) -> new Line(rs.getString(1), rs.getString(2), rs.getString(3),
-                rs.getBigDecimal(4).toPlainString(), rs.getInt(5), rs.getBigDecimal(6).toPlainString()), orderId, actor);
+                rs.getBigDecimal(4).toPlainString(), rs.getInt(5), rs.getBigDecimal(6).toPlainString()), orderId);
         var header = orders.get(0);
         var order = header.order();
         return ResponseEntity.ok(new OrderDetail(order.id(), order.orderCode(), order.status(), order.paymentMethod(),
@@ -79,7 +84,7 @@ class OrderHistoryController {
                 """, Boolean.class, actor));
     }
 
-    private static Summary summary(ResultSet rs) throws SQLException {
+    static Summary summary(ResultSet rs) throws SQLException {
         var paidAt = rs.getObject("paid_at", OffsetDateTime.class);
         return new Summary(rs.getString("id"), rs.getString("order_code"), rs.getString("status"),
                 rs.getString("payment_method"), rs.getString("payment_status"),

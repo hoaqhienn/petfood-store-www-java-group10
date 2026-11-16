@@ -79,7 +79,7 @@ Mọi route dưới đây yêu cầu ADMIN ACTIVE.
 | GET /admin/users; GET /admin/users/{id} | q/status/role, danh sách/chi tiết không password/hash |
 | PATCH /admin/users/{id} | displayName,phone,status,version; không tự khóa admin hiện tại/cuối cùng |
 | DELETE /admin/users/{id} | 409 USER_HAS_ORDERS nếu đã đặt dù hủy; bảo vệ admin |
-| GET /admin/orders; GET /admin/orders/{id} | orderCode/customer/dateFrom/dateTo/status, sắp xếp ngày mua |
+| GET /admin/orders; GET /admin/orders/{id} | Đã triển khai cho admin ACTIVE. Danh sách hỗ trợ page/size, orderCode, customer (tên hoặc email), status, dateFrom/dateTo (YYYY-MM-DD, bao gồm cả hai ngày theo giờ Việt Nam). Đơn mới nhất đứng trước. Mỗi mục gồm order, customerId, customerName, customerEmail. Chi tiết trả snapshot nhận hàng và dòng đơn. |
 | PATCH /admin/orders/{id}/items/{itemId} | quantity,reason,version; itemId phải thuộc đơn; giữ giá snapshot |
 | POST /admin/orders/{id}/transitions | toStatus,reason,version; COMPLETED thêm codReceived=true; không nhảy trạng thái |
 | GET /admin/notifications; POST /admin/notifications/{id}/retry | Xem trạng thái/lỗi đã che dữ liệu; retry FAILED, không tạo lại đơn/user |
