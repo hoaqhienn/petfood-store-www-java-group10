@@ -18,18 +18,29 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.RedisConnectionFailureException;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.web.servlet.MockMvc;
+import vn.edu.dhktpm19att.group10.petfood.cart.SessionCartStore;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 /**
  * Checkout races need committed data and real concurrent transactions, so this class is not @Transactional.
@@ -45,6 +56,8 @@ class ConcurrentCheckoutIntegrationTest {
     @Autowired MockMvc mvc;
     @Autowired ObjectMapper json;
     @Autowired PasswordEncoder passwords;
+    @MockitoSpyBean RedisConnectionFactory redis;
+    @MockitoSpyBean SessionCartStore carts;
 
     long category;
 
@@ -69,6 +82,63 @@ class ConcurrentCheckoutIntegrationTest {
         jdbc.update("DELETE FROM user_account WHERE email_normalized LIKE 'race-%@example.test'");
         jdbc.update("DELETE FROM product WHERE sku LIKE 'RACE-%'");
         jdbc.update("DELETE FROM category WHERE slug = 'race-test'");
+    }
+
+    @Test
+    void redisUnavailableBeforeCheckoutPreservesCartAndStock() throws Exception {
+        long product = product("RACE-REDIS-BEFORE", 3);
+        var buyer = buyer("race-redis-before@example.test", product);
+        doThrow(new RedisConnectionFailureException("AC22: Redis unavailable")).when(redis).getConnection();
+        try {
+            var response = placeOrder(buyer);
+            assertThat(response.getStatus()).isEqualTo(503);
+            assertThat(json.readTree(response.getContentAsString()).path("code").asText())
+                    .isEqualTo("DEPENDENCY_UNAVAILABLE");
+            assertThat(stock(product)).isEqualTo(3);
+            assertThat(orderCount(product)).isZero();
+        } finally {
+            doCallRealMethod().when(redis).getConnection();
+        }
+        mvc.perform(get("/api/v1/cart").cookie(buyer.session()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.revision").value(buyer.quote().get("cartRevision").asInt()))
+                .andExpect(jsonPath("$.items[0].quantity").value(1));
+    }
+
+    @Test
+    void redisCleanupFailureAfterCommitReturnsOrderAndRetryCleansCart() throws Exception {
+        long product = product("RACE-REDIS-AFTER", 3);
+        var buyer = buyer("race-redis-after@example.test", product);
+        String key = UUID.randomUUID().toString();
+        doAnswer(invocation -> {
+            assertThat(orderCount(product)).isEqualTo(1);
+            doThrow(new RedisConnectionFailureException("AC22: Redis unavailable after commit"))
+                    .when(redis).getConnection();
+            return invocation.callRealMethod();
+        }).doCallRealMethod().when(carts).clearIfCurrent(any(), anyString(), anyLong());
+
+        MockHttpServletResponse created;
+        try {
+            created = placeOrder(buyer, key);
+        } finally {
+            doCallRealMethod().when(redis).getConnection();
+        }
+        assertThat(created.getStatus()).isEqualTo(201);
+        String orderId = json.readTree(created.getContentAsString()).get("id").asText();
+        assertThat(orderCount(product)).isEqualTo(1);
+        assertThat(stock(product)).isEqualTo(2);
+
+        var retry = placeOrder(buyer, key);
+        assertThat(retry.getStatus()).isEqualTo(200);
+        assertThat(json.readTree(retry.getContentAsString()).get("id").asText()).isEqualTo(orderId);
+        assertThat(orderCount(product)).isEqualTo(1);
+        assertThat(stock(product)).isEqualTo(2);
+        mvc.perform(get("/api/v1/cart").cookie(buyer.session()))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.items").isEmpty());
+    }
+
+    private int orderCount(long product) {
+        return jdbc.queryForObject("SELECT count(*) FROM order_item WHERE product_id = ?", Integer.class, product);
     }
 
     @Test
@@ -162,13 +232,17 @@ class ConcurrentCheckoutIntegrationTest {
     }
 
     private MockHttpServletResponse placeOrder(Buyer buyer) throws Exception {
+        return placeOrder(buyer, UUID.randomUUID().toString());
+    }
+
+    private MockHttpServletResponse placeOrder(Buyer buyer, String key) throws Exception {
         String body = """
                 {"cartToken":"%s","cartRevision":%d,"quoteToken":"%s","paymentMethod":"COD",
                  "recipient":{"name":"Race buyer","phone":"0900000000","address":"Local QA"}}
                 """.formatted(buyer.quote().get("cartToken").asText(), buyer.quote().get("cartRevision").asLong(),
                 buyer.quote().get("quoteToken").asText());
         return mvc.perform(post("/api/v1/orders").cookie(buyer.session()).header(buyer.csrfHeader(), buyer.csrfToken())
-                        .header("Idempotency-Key", UUID.randomUUID().toString())
+                        .header("Idempotency-Key", key)
                         .contentType(MediaType.APPLICATION_JSON).content(body))
                 .andReturn().getResponse();
     }
