@@ -18,6 +18,8 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 @RestController
 @RequestMapping("/api/v1")
 class CatalogController {
+    private static final java.util.Set<String> SORTS = java.util.Set.of("name,asc", "name,desc", "price,asc", "price,desc");
+
     private final CatalogQueries catalog;
 
     CatalogController(CatalogQueries catalog) {
@@ -44,7 +46,10 @@ class CatalogController {
                 || species.length() > 32 || lifeStage.length() > 32
                 || (categoryId != null && categoryId < 1)
                 || invalidPrice(minPrice) || invalidPrice(maxPrice)
-                || (minPrice != null && maxPrice != null && minPrice.compareTo(maxPrice) > 0)) {
+                || (minPrice != null && maxPrice != null && minPrice.compareTo(maxPrice) > 0)
+                // Checked here: an exception thrown inside the @Repository would be translated into a
+                // DataAccessException and reported as 503 instead of 400.
+                || !SORTS.contains(sort)) {
             throw new IllegalArgumentException("Bộ lọc hoặc thông tin phân trang không hợp lệ.");
         }
         return catalog.products(q.strip(), categoryId, species, lifeStage, minPrice, maxPrice, page, size, sort);
