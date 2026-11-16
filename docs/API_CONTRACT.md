@@ -36,7 +36,7 @@
 | DELETE /cart/items/{productId}?expectedRevision=… | Public Session | Xóa dòng, 204; revision stale trả 409 |
 
 | POST /checkout/preview | Customer | cartRevision; báo giá, quoteToken và expiresAt; không giữ hàng |
-| POST /orders | Customer | Idempotency-Key header + cartToken/cartRevision,quoteToken,recipient,paymentMethod=COD |
+| POST /orders | Customer | Đã triển khai. Idempotency-Key header + cartToken/cartRevision,quoteToken,recipient,paymentMethod=COD |
 | GET /orders | Customer | Chỉ đơn của actor, phân trang |
 | GET /orders/{id} | Chủ đơn | Snapshot, tổng, trạng thái, version; ID người khác trả 404 |
 | POST /orders/{id}/cancel | Chủ đơn | reason,version; chỉ PENDING, trả đơn cập nhật |

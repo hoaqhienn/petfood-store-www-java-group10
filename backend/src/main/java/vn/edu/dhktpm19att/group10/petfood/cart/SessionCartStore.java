@@ -72,6 +72,14 @@ public class SessionCartStore {
         return read(session).cart();
     }
 
+    public void clearIfCurrent(HttpSession session, String token, long revision) {
+        var snapshot = read(session);
+        var cart = snapshot.cart();
+        if (cart.cartToken().equals(token) && cart.revision() == revision) {
+            replace(session, snapshot, new Cart(token, revision + 1, Map.of()));
+        }
+    }
+
     public record Cart(String cartToken, long revision, Map<String, Integer> quantities) {}
     record Snapshot(String raw, Cart cart) {}
 }

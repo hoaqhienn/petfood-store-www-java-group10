@@ -19,7 +19,8 @@ public class SecurityConfig {
                 .csrf(config -> config.csrfTokenRepository(csrf))
                 .exceptionHandling(config -> config.authenticationEntryPoint((request, response, error) -> {
                     boolean profile = (request.getContextPath() + "/api/v1/me").equals(request.getRequestURI());
-                    boolean checkout = (request.getContextPath() + "/api/v1/checkout/preview").equals(request.getRequestURI());
+                    boolean checkout = (request.getContextPath() + "/api/v1/checkout/preview").equals(request.getRequestURI())
+                            || (request.getContextPath() + "/api/v1/orders").equals(request.getRequestURI());
                     response.setStatus(profile || checkout ? 401 : 403);
                 }))
                 .logout(config -> config.logoutUrl("/api/v1/auth/logout")
@@ -31,6 +32,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/v1/auth/register", "/api/v1/auth/login").anonymous()
                 .requestMatchers(HttpMethod.GET, "/api/v1/me").authenticated()
                 .requestMatchers(HttpMethod.POST, "/api/v1/checkout/preview").hasAnyRole("CUSTOMER", "ADMIN")
+                .requestMatchers(HttpMethod.POST, "/api/v1/orders").hasAnyRole("CUSTOMER", "ADMIN")
                 .requestMatchers(HttpMethod.POST, "/api/v1/cart/items").permitAll()
                 .requestMatchers(HttpMethod.PATCH, "/api/v1/cart/items/{id}").permitAll()
                 .requestMatchers(HttpMethod.DELETE, "/api/v1/cart/items/{id}").permitAll()
