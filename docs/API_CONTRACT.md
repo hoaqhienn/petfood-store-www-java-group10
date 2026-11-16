@@ -69,12 +69,12 @@ Mọi route dưới đây yêu cầu ADMIN ACTIVE.
 
 | Method / route | Nội dung / quy tắc |
 |---|---|
-| GET /admin/products; GET /admin/products/{id} | Tìm q/sku/category/status, list gồm cả ẩn; xem chi tiết |
-| POST /admin/products; PATCH /admin/products/{id} | Thêm/sửa trường catalog, version; không sửa tồn trực tiếp qua update thông thường |
-| POST /admin/products/{id}/stock-adjustments | delta nguyên có dấu,reason,version; transaction, không làm tồn âm; ghi audit |
-| DELETE /admin/products/{id} | 409 PRODUCT_REFERENCED nếu có dòng đơn bất kỳ |
-| GET /admin/categories; GET /admin/categories/{id} | Tìm tên/status, danh sách và chi tiết |
-| POST /admin/categories; PATCH /admin/categories/{id} | name,slug,status,version |
+| GET /admin/products; GET /admin/products/{id} | Đã triển khai. Lọc `q` (tên/SKU), `categoryId`, `status`, `page`, `size`; gồm cả sản phẩm ẩn, kèm trạng thái danh mục, `contentVersion`, `version`. |
+| POST /admin/products; PATCH /admin/products/{id} | Đã triển khai. Trường: categoryId, sku (lưu chữ hoa, duy nhất), name, description, species (DOG/CAT/BOTH), lifeStage (JUNIOR/ADULT/SENIOR/ALL), brand, weightGrams, price (chuỗi VND nguyên > 0), imageUrl, status. POST nhận thêm `initialStock`; PATCH cần `version` và từ chối mọi trường tồn kho. Sửa nội dung tăng `contentVersion`. SKU trùng trả 409 `DUPLICATE_VALUE`. |
+| POST /admin/products/{id}/stock-adjustments | Đã triển khai. `delta` nguyên khác 0, `reason`, `version`; tồn âm trả 422 `INVALID_STOCK`. Checkout cũng tăng version sản phẩm nên form cũ trả 409. Ghi `inventory_movement` với người thao tác và lý do. |
+| DELETE /admin/products/{id} | Đã triển khai. 204; 409 `PRODUCT_REFERENCED` nếu có trong bất kỳ đơn nào kể cả đơn hủy. Lịch sử tồn giữ `sku_snapshot`. |
+| GET /admin/categories; GET /admin/categories/{id} | Đã triển khai. Lọc `q` (tên/slug), `status`; kèm `productCount`. |
+| POST /admin/categories; PATCH /admin/categories/{id} | Đã triển khai. name, slug (chữ thường không dấu, số, gạch ngang; duy nhất), status ACTIVE/INACTIVE; PATCH cần `version`. Ẩn danh mục khóa danh mục trước, cùng thứ tự với checkout (AC36). |
 | DELETE /admin/categories/{id} | 409 CATEGORY_NOT_EMPTY nếu còn SKU, kể cả ẩn |
 | GET /admin/users; GET /admin/users/{id} | Đã triển khai. Lọc `q` (email hoặc tên), `status`, `role`, `page`, `size`; mới tạo trước. Trả id, email, displayName, phone, role, status, createdAt, version, orderCount; không có password/hash. |
 | PATCH /admin/users/{id} | Đã triển khai. Chỉ nhận `displayName`, `phone` (null để xóa), `status` (ACTIVE/LOCKED), `version`; trường khác (email, role, password...) trả 422. Không khóa chính mình hoặc admin ACTIVE cuối cùng (409 `ADMIN_PROTECTED`). Tài khoản bị khóa mất quyền từ request kế tiếp. |
