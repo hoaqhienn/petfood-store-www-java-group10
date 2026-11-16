@@ -68,26 +68,26 @@ Chỉ ghi **Có test** khi integration test tương ứng đang chạy và pass 
 
 | AC | Trạng thái | Test trong `backend/src/test` | Còn thiếu |
 |---|---|---|---|
-| AC01 | Một phần | `InfrastructureIntegrationTest.catalogShows…` | Lọc theo giá/loài/độ tuổi, phân trang, sort |
-| AC02 | Một phần | `InfrastructureIntegrationTest.catalogShows…` | Thêm giỏ/checkout sản phẩm hết hàng bị từ chối |
+| AC01 | Có test | `CatalogAndCartRulesIntegrationTest`, `InfrastructureIntegrationTest` | — |
+| AC02 | Có test | `CatalogAndCartRulesIntegrationTest`, `CheckoutRulesIntegrationTest` | — |
 | AC03 | Có test | `InfrastructureIntegrationTest.guestCart…` | — |
-| AC04 | Chưa | — | Số lượng 0/âm/thập phân/>99, quá 50 SKU |
-| AC05 | Một phần | `InfrastructureIntegrationTest.guestCart…` | Kiểm tra hash khác mật khẩu, nội dung mail đăng ký |
-| AC06 | Chưa | — | Hai lần đăng ký đồng thời cùng email |
+| AC04 | Có test | `CatalogAndCartRulesIntegrationTest` | — |
+| AC05 | Có test | `RegistrationIntegrationTest` | — |
+| AC06 | Có test | `RegistrationIntegrationTest` | — |
 | AC07 | Có test | `InfrastructureIntegrationTest.guestCart…` | — |
 | AC08 | Có test | `Admin*IntegrationTest`, `InfrastructureIntegrationTest` | — |
-| AC09 | Một phần | `InfrastructureIntegrationTest.guestCart…` | Giỏ rỗng, thiếu địa chỉ, giá đổi sau preview |
+| AC09 | Có test | `CheckoutRulesIntegrationTest`, `InfrastructureIntegrationTest` | — |
 | AC10 | Có test | `InfrastructureIntegrationTest.guestCart…` | — |
 | AC11 | Có test | `ConcurrentCheckoutIntegrationTest` | — |
 | AC12 | Có test | `InfrastructureIntegrationTest.guestCart…` | — |
-| AC13 | Một phần | `CartTabsIntegrationTest` | Cùng key khác nội dung trả 409 |
+| AC13 | Có test | `CheckoutRulesIntegrationTest`, `CartTabsIntegrationTest` | — |
 | AC14 | Có test | `InfrastructureIntegrationTest.guestCart…` | — |
 | AC15 | Có test | `AdminOrderCommandIntegrationTest`, `InfrastructureIntegrationTest` | — |
 | AC16 | Có test | `AdminOrderCommandIntegrationTest` | — |
 | AC17 | Có test | `AdminOrderCommandIntegrationTest`, `InfrastructureIntegrationTest` | — |
 | AC18 | Có test | `AdminCatalogIntegrationTest` | — |
 | AC19 | Có test | `AdminUserIntegrationTest` | — |
-| AC20 | Một phần | `InfrastructureIntegrationTest`, `TrackingIntegrationTest` | Tìm theo mã đơn và khoảng ngày |
+| AC20 | Có test | `AdminOrderSearchIntegrationTest`, `TrackingIntegrationTest` | — |
 | AC21 | Có test | `AdminNotificationIntegrationTest` | Chưa thử với Mailpit thật |
 | AC22 | Chưa | — | Mất Redis trước/sau commit (cần kiểm thử thủ công) |
 | AC23 | Có test | `PetProfileIntegrationTest` | — |
@@ -99,10 +99,10 @@ Chỉ ghi **Có test** khi integration test tương ứng đang chạy và pass 
 | AC29 | Có test | `TrackingIntegrationTest` | — |
 | AC30 | Có test | `AdminCatalogIntegrationTest` | — |
 | AC31 | Có test | `CartTabsIntegrationTest` | — |
-| AC32 | Chưa | — | Người khác hoặc tài khoản bị khóa dùng lại key đặt đơn |
-| AC33 | Một phần | `AdminUserIntegrationTest`, `PetProfileIntegrationTest` | Đăng ký kèm `role` trong body |
+| AC32 | Có test | `CheckoutRulesIntegrationTest` | — |
+| AC33 | Có test | `RegistrationIntegrationTest`, `AdminUserIntegrationTest`, `PetProfileIntegrationTest` | — |
 | AC34 | Có test | `AdminBootstrapIntegrationTest` | — |
-| AC35 | Một phần | `AdminCatalogIntegrationTest`, `PetProfileIntegrationTest` | Dữ liệu người nhận sai khi đặt đơn |
-| AC36 | Chưa | — | Ẩn danh mục/SKU cạnh tranh với checkout (thứ tự khóa đã cài, chưa có test) |
+| AC35 | Có test | `CheckoutRulesIntegrationTest`, `AdminCatalogIntegrationTest`, `PetProfileIntegrationTest` | — |
+| AC36 | Có test | `HideDuringCheckoutIntegrationTest` | — |
 
-Tổng: 23 có test, 8 một phần, 5 chưa. Ngoài ra chưa có E2E giao diện và chưa demo trọn luồng trên Docker.
+Tổng: 35 có test, 0 một phần, 1 chưa. Ngoài ra chưa có E2E giao diện và chưa demo trọn luồng trên Docker.
