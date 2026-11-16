@@ -5,21 +5,28 @@
 Đồ án **Lập trình WWW (Java)** · Lớp **DHKTPM19ATT** · **Nhóm 10** · **Đề tài 42**.
 Thời gian dự kiến: **01–30/11/2026**.
 
-## Trạng thái hiện tại
+## Trạng thái hiện tại (16/11/2026)
 
-Đây là **bộ khung khởi đầu**, chưa phải website bán hàng hoàn chỉnh.
+Luồng mua hàng COD phía **backend** đã chạy được: xem sản phẩm → giỏ hàng → đăng nhập → xem trước → đặt đơn → email xác nhận. Giao diện mới có danh mục và giỏ hàng; các phần quản trị ghi dữ liệu, AI và tracking chưa làm.
 
-- Có: Spring Boot + Gradle Wrapper, React + TypeScript, trang giới thiệu và trang giữ chỗ `/admin`.
-- Có: API giới thiệu, health check, Spring Security chặn API chưa triển khai.
-- Có: PostgreSQL + pgvector, Redis Session, Flyway, cấu hình SMTP/Mailpit, Docker Compose.
-- Có: kiểm thử API, kiểm thử tích hợp hạ tầng và GitHub Actions.
-- Chưa có: đăng ký/đăng nhập, CRUD nghiệp vụ, giỏ hàng, checkout, email nghiệp vụ, AI và tracking.
+| Phần | Backend (API) | Frontend |
+|---|---|---|
+| Hạ tầng: PostgreSQL + pgvector, Redis Session, Flyway, Mailpit, Docker Compose, CI | Có | Có |
+| Catalog: danh mục, danh sách có lọc, chi tiết, ẩn sản phẩm ngừng bán | Có | Có |
+| Giỏ hàng guest trong Redis Session, revision chống ghi đè, CSRF | Có | Có |
+| Đăng ký, đăng nhập/đăng xuất Session, `/me`, phân quyền CUSTOMER/ADMIN | Có | Chưa |
+| Xem trước checkout COD, đặt đơn (trừ tồn, chống gửi lặp) | Có | Chưa |
+| Email đăng ký/xác nhận đơn qua outbox, tự thử lại | Có | — |
+| Lịch sử, chi tiết đơn và hủy đơn `PENDING` của khách | Có | Chưa |
+| Quản trị đơn: tìm kiếm, xem chi tiết | Có (chỉ đọc) | Chưa (`/admin` giữ chỗ) |
+| Quản trị: đổi trạng thái/số lượng đơn, CRUD sản phẩm/danh mục/user | Chưa | Chưa |
+| Hồ sơ thú cưng, RAG/pgvector, tracking, cá nhân hóa | Chưa | Chưa |
 
-**Phân tích cập nhật 03/11/2026:** đã bổ sung danh mục 15 chức năng, ma trận quyền, quy tắc đơn COD/tồn kho, API dự thảo, mô hình dữ liệu và 30 kịch bản nghiệm thu. Đây là tài liệu thiết kế, chưa triển khai nghiệp vụ; các quyết định D01–D08 được đánh dấu đề xuất để review.
+Kiểm thử tích hợp hiện mới phủ catalog, giỏ hàng và hạ tầng. Tài khoản, đặt/hủy đơn và quản trị đơn chưa có test tự động. Migration cũng chưa tạo sẵn tài khoản ADMIN.
+
+Tài liệu thiết kế (03–04/11): 15 chức năng, ma trận quyền, quy tắc COD/tồn kho, API, mô hình dữ liệu, ràng buộc RB01–RB22 trong [CONSTRAINTS.md](docs/CONSTRAINTS.md) và 36 kịch bản nghiệm thu.
 
 ## Công nghệ
-
-Rà soát bổ sung: [CONSTRAINTS.md](docs/CONSTRAINTS.md) ánh xạ RB01–RB22 sang nơi thực thi và kịch bản kiểm thử; danh sách nghiệm thu hiện tăng từ 30 lên **36**. Những ràng buộc nghiệp vụ này chưa được triển khai trong mã chạy.
 
 | Thành phần | Lựa chọn |
 |---|---|
@@ -68,15 +75,22 @@ Lệnh `down` giữ dữ liệu trong volumes. **`down -v` xóa dữ liệu loca
 backend/
   gradle/wrapper/         # Gradle được pin và kiểm tra checksum
   src/main/java/.../petfood/
+    account/             # Đăng ký, đăng nhập, /me, worker gửi email outbox
+    cart/                # Giỏ hàng trong Redis Session
+    catalog/             # Danh mục và sản phẩm
+    checkout/            # Xem trước, đặt/hủy đơn COD, lịch sử, quản trị đơn
     config/              # Spring Security, cấu hình chung
     system/              # API giới thiệu
   src/main/resources/
-    db/migration/        # Flyway; V1 bật extension vector
+    db/migration/        # Flyway V1–V6: pgvector, catalog, tài khoản/outbox, đơn COD
+    db/demo/             # Dữ liệu sản phẩm mẫu (bật qua PETFOOD_FLYWAY_LOCATIONS)
   src/test/              # API security + tích hợp PostgreSQL/Redis
 frontend/
-  src/app/               # App, trang giới thiệu, CSS
+  src/app/               # App, routing, CSS chung
+  src/components/        # Header, Footer, Sidebar, Hero, thẻ sản phẩm
+  src/features/          # catalog/, cart/ (giỏ demo và giỏ theo Session)
   src/shared/            # API client dùng đường dẫn tương đối
-  src/features/          # Vị trí mở rộng module nghiệp vụ
+  tests/                 # Test API client giỏ hàng (node --test)
 docs/                    # Chạy local, kiến trúc, phạm vi, roadmap
 .github/                 # CI, mẫu PR và issue
 compose.yaml
