@@ -18,7 +18,8 @@ public class SecurityConfig {
         http.securityContext(config -> config.securityContextRepository(contexts))
                 .csrf(config -> config.csrfTokenRepository(csrf))
                 .exceptionHandling(config -> config.authenticationEntryPoint((request, response, error) -> {
-                    boolean profile = (request.getContextPath() + "/api/v1/me").equals(request.getRequestURI());
+                    String me = request.getContextPath() + "/api/v1/me";
+                    boolean profile = me.equals(request.getRequestURI()) || request.getRequestURI().startsWith(me + "/");
                     boolean checkout = (request.getContextPath() + "/api/v1/checkout/preview").equals(request.getRequestURI())
                             || (request.getContextPath() + "/api/v1/orders").equals(request.getRequestURI());
                     boolean orderDetail = request.getRequestURI().startsWith(request.getContextPath() + "/api/v1/orders/");
@@ -32,6 +33,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/v1/cart", "/api/v1/auth/csrf").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/v1/auth/register", "/api/v1/auth/login").anonymous()
                 .requestMatchers(HttpMethod.GET, "/api/v1/me").authenticated()
+                .requestMatchers("/api/v1/me/pets", "/api/v1/me/pets/**").hasAnyRole("CUSTOMER", "ADMIN")
                 .requestMatchers(HttpMethod.POST, "/api/v1/checkout/preview").hasAnyRole("CUSTOMER", "ADMIN")
                 .requestMatchers(HttpMethod.POST, "/api/v1/orders").hasAnyRole("CUSTOMER", "ADMIN")
                 .requestMatchers(HttpMethod.POST, "/api/v1/orders/{id}/cancel").hasAnyRole("CUSTOMER", "ADMIN")
