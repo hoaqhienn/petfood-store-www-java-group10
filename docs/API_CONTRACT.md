@@ -35,12 +35,15 @@
 | PATCH /cart/items/{productId} | Public Session | quantity tuyệt đối, expectedRevision |
 | DELETE /cart/items/{productId}?expectedRevision=… | Public Session | Xóa dòng, 204; revision stale trả 409 |
 
-Khởi tạo phiên bằng GET `/cart` và GET `/auth/csrf` tuần tự trước khi gửi mutation. Gửi token CSRF theo `headerName` trả về. POST/PATCH trả giỏ mới, cùng cấu trúc GET. Mỗi dòng gồm `productId`, `quantity`, `name`, `unitPrice`, `availableStock` và `availabilityError` (null khi mua được). Dòng bị ẩn hoặc xóa vẫn có thể xóa khỏi giỏ, với tên/giá/tồn là null và không tính vào subtotal. Dòng thiếu tồn vẫn có giá hiện hành và được đánh dấu lỗi. Khi nhận `409 CART_CHANGED`, đọc lại giỏ trước khi người dùng xác nhận thao tác tiếp theo.
 | POST /checkout/preview | Customer | cartRevision; báo giá, quoteToken và expiresAt; không giữ hàng |
 | POST /orders | Customer | Idempotency-Key header + cartToken/cartRevision,quoteToken,recipient,paymentMethod=COD |
 | GET /orders | Customer | Chỉ đơn của actor, phân trang |
 | GET /orders/{id} | Chủ đơn | Snapshot, tổng, trạng thái, version; ID người khác trả 404 |
 | POST /orders/{id}/cancel | Chủ đơn | reason,version; chỉ PENDING, trả đơn cập nhật |
+
+Khởi tạo phiên bằng GET `/cart` và GET `/auth/csrf` tuần tự trước khi gửi mutation. Gửi token CSRF theo `headerName` trả về. POST/PATCH trả giỏ mới, cùng cấu trúc GET. Mỗi dòng gồm `productId`, `quantity`, `name`, `unitPrice`, `availableStock` và `availabilityError` (null khi mua được). Dòng bị ẩn hoặc xóa vẫn có thể xóa khỏi giỏ, với tên/giá/tồn là null và không tính vào subtotal. Dòng thiếu tồn vẫn có giá hiện hành và được đánh dấu lỗi. Khi nhận `409 CART_CHANGED`, đọc lại giỏ trước khi người dùng xác nhận thao tác tiếp theo.
+
+Preview đã triển khai cho CUSTOMER và ADMIN đang hoạt động. Gửi JSON `{"cartRevision":4}` với CSRF. Response 200 gồm `quoteToken`, `cartToken`, `cartRevision`, `expiresAt`, `items` (productId, sku, name, quantity, unitPrice, lineTotal), `subtotal`, `shippingFee`, `grandTotal` và `paymentMethod` là COD. Tiền là chuỗi VND, phí giao hàng demo bằng 0. Báo giá lưu trong Redis 10 phút và gắn với tài khoản cùng phiên bản giỏ. Revision cũ trả 409; giỏ rỗng, hàng ẩn hoặc thiếu tồn trả 422. Bước tạo đơn phải kiểm tra lại giá và tồn kho.
 
 Ví dụ đặt đơn (không đưa giá/tổng từ client làm nguồn sự thật):
 

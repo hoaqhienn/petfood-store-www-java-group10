@@ -101,6 +101,18 @@ class InfrastructureIntegrationTest {
                 .andExpect(status().isForbidden());
         var freshCsrf = json.readTree(mvc.perform(get("/api/v1/auth/csrf").cookie(rotated))
                 .andExpect(status().isOk()).andReturn().getResponse().getContentAsString());
+        mvc.perform(post("/api/v1/checkout/preview").cookie(rotated)
+                        .header(header, freshCsrf.get("token").asText()).contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"cartRevision\":3}"))
+                .andExpect(status().isConflict()).andExpect(jsonPath("$.code").value("CART_CHANGED"));
+        mvc.perform(post("/api/v1/checkout/preview").cookie(rotated)
+                        .header(header, freshCsrf.get("token").asText()).contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"cartRevision\":4}"))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.quoteToken").isString())
+                .andExpect(jsonPath("$.grandTotal").value("56000"))
+                .andExpect(jsonPath("$.items[0].quantity").value(2));
+        assertThat(jdbc.queryForObject("SELECT available_stock FROM product WHERE id = ?",
+                Integer.class, product)).isEqualTo(8);
         mvc.perform(post("/api/v1/auth/logout").cookie(rotated).header(header, freshCsrf.get("token").asText()))
                 .andExpect(status().isNoContent());
         mvc.perform(get("/api/v1/me").cookie(rotated)).andExpect(status().isUnauthorized());
