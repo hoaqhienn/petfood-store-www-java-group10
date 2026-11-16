@@ -123,6 +123,21 @@ class InfrastructureIntegrationTest {
                         .header("Idempotency-Key", key).contentType(MediaType.APPLICATION_JSON).content(body))
                 .andExpect(status().isCreated()).andExpect(jsonPath("$.paymentStatus").value("UNPAID")).andReturn();
         String orderId = json.readTree(order.getResponse().getContentAsString()).get("id").asText();
+        mvc.perform(get("/api/v1/admin/orders").cookie(rotated)).andExpect(status().isForbidden());
+        Long adminId = jdbc.queryForObject("""
+                INSERT INTO user_account (email_normalized, display_name, password_hash, role, status)
+                VALUES ('admin-orders@example.test', 'Admin', 'unused', 'ADMIN', 'ACTIVE') RETURNING id
+                """, Long.class);
+        var admin = org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors
+                .user(adminId.toString()).roles("ADMIN");
+        mvc.perform(get("/api/v1/admin/orders").with(admin).param("customer", "cartuser@example.test")
+                        .param("status", "PENDING"))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.totalElements").value(1))
+                .andExpect(jsonPath("$.items[0].order.id").value(orderId));
+        mvc.perform(get("/api/v1/admin/orders/{id}", orderId).with(admin))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.id").value(orderId));
+        jdbc.update("UPDATE user_account SET status = 'LOCKED' WHERE id = ?", adminId);
+        mvc.perform(get("/api/v1/admin/orders").with(admin)).andExpect(status().isForbidden());
         jdbc.update("UPDATE product SET name = 'Updated catalog name', price = 30000 WHERE id = ?", product);
         mvc.perform(get("/api/v1/orders").cookie(rotated).param("size", "1"))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.totalElements").value(1))
