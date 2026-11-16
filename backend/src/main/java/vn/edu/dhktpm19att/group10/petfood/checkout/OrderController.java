@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import vn.edu.dhktpm19att.group10.petfood.cart.SessionCartStore;
+import vn.edu.dhktpm19att.group10.petfood.tracking.Tracking;
 
 @RestController
 @RequestMapping("/api/v1/orders")
@@ -23,11 +24,13 @@ class OrderController {
     private final OrderPlacement orders;
     private final SessionCartStore carts;
     private final ObjectMapper json;
+    private final Tracking tracking;
 
-    OrderController(OrderPlacement orders, SessionCartStore carts, ObjectMapper json) {
+    OrderController(OrderPlacement orders, SessionCartStore carts, ObjectMapper json, Tracking tracking) {
         this.orders = orders;
         this.carts = carts;
         this.json = json;
+        this.tracking = tracking;
     }
 
     @PostMapping
@@ -43,6 +46,8 @@ class OrderController {
         } catch (DataAccessException exception) {
             // The same request can retry cleanup without creating a second order.
         }
+        // Only the backend records a placed order, once, and only with analytics consent (BR25).
+        if (!result.replay()) tracking.serverEvent(session, authentication, "order_placed", java.util.Map.of());
         return ResponseEntity.status(result.replay() ? 200 : 201).body(result.order());
     }
 

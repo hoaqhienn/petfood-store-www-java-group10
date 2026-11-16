@@ -34,6 +34,10 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/v1/auth/register", "/api/v1/auth/login").anonymous()
                 // Public but CSRF-protected and limited per Session by AiQuota.
                 .requestMatchers(HttpMethod.POST, "/api/v1/search/semantic", "/api/v1/assistant/messages").permitAll()
+                // Opt-in tracking works per Session for guests too; writes still need CSRF.
+                .requestMatchers(HttpMethod.GET, "/api/v1/consent", "/api/v1/recommendations").permitAll()
+                .requestMatchers(HttpMethod.PUT, "/api/v1/consent").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/v1/events").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/me").authenticated()
                 .requestMatchers("/api/v1/me/pets", "/api/v1/me/pets/**").hasAnyRole("CUSTOMER", "ADMIN")
                 .requestMatchers(HttpMethod.POST, "/api/v1/checkout/preview").hasAnyRole("CUSTOMER", "ADMIN")
