@@ -76,9 +76,9 @@ Mọi route dưới đây yêu cầu ADMIN ACTIVE.
 | GET /admin/categories; GET /admin/categories/{id} | Tìm tên/status, danh sách và chi tiết |
 | POST /admin/categories; PATCH /admin/categories/{id} | name,slug,status,version |
 | DELETE /admin/categories/{id} | 409 CATEGORY_NOT_EMPTY nếu còn SKU, kể cả ẩn |
-| GET /admin/users; GET /admin/users/{id} | q/status/role, danh sách/chi tiết không password/hash |
-| PATCH /admin/users/{id} | displayName,phone,status,version; không tự khóa admin hiện tại/cuối cùng |
-| DELETE /admin/users/{id} | 409 USER_HAS_ORDERS nếu đã đặt dù hủy; bảo vệ admin |
+| GET /admin/users; GET /admin/users/{id} | Đã triển khai. Lọc `q` (email hoặc tên), `status`, `role`, `page`, `size`; mới tạo trước. Trả id, email, displayName, phone, role, status, createdAt, version, orderCount; không có password/hash. |
+| PATCH /admin/users/{id} | Đã triển khai. Chỉ nhận `displayName`, `phone` (null để xóa), `status` (ACTIVE/LOCKED), `version`; trường khác (email, role, password...) trả 422. Không khóa chính mình hoặc admin ACTIVE cuối cùng (409 `ADMIN_PROTECTED`). Tài khoản bị khóa mất quyền từ request kế tiếp. |
+| DELETE /admin/users/{id} | Đã triển khai. 204; 409 `USER_HAS_ORDERS` nếu từng đặt đơn kể cả đơn hủy (chỉ được khóa); 409 `ADMIN_PROTECTED` với chính mình/admin cuối cùng. Email chờ gửi của tài khoản bị hủy. |
 | GET /admin/orders; GET /admin/orders/{id} | Đã triển khai cho admin ACTIVE. Danh sách hỗ trợ page/size, orderCode, customer (tên hoặc email), status, dateFrom/dateTo (YYYY-MM-DD, bao gồm cả hai ngày theo giờ Việt Nam). Đơn mới nhất đứng trước. Mỗi mục gồm order, customerId, customerName, customerEmail. Chi tiết trả snapshot nhận hàng và dòng đơn. |
 | PATCH /admin/orders/{id}/items/{itemId} | quantity,reason,version; itemId phải thuộc đơn; giữ giá snapshot |
 | POST /admin/orders/{id}/transitions | toStatus,reason,version; COMPLETED thêm codReceived=true; không nhảy trạng thái |
