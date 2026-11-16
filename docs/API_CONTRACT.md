@@ -90,7 +90,7 @@ Mọi route dưới đây yêu cầu ADMIN ACTIVE.
 
 | Route dự kiến | Phạm vi |
 |---|---|
-| GET/POST /me/pets; GET/PATCH/DELETE /me/pets/{id} | Chủ hồ sơ, validate tên/loài và dữ liệu tùy chọn |
+| GET/POST /me/pets; GET/PATCH/DELETE /me/pets/{id} | Đã triển khai cho CUSTOMER/ADMIN ACTIVE; chưa đăng nhập trả 401. Trường: `name` (1–60), `species` (DOG/CAT) bắt buộc; tùy chọn `birthDate` (YYYY-MM-DD, không ở tương lai), `estimatedAgeMonths` (0–360), `weightGrams` (1–200000), `preferences` (≤500, null để xóa). PATCH cần `version`; trường lạ như `ownerId` trả 422. Tối đa 20 thú cưng mỗi tài khoản. Hồ sơ của người khác trả 404. Xóa hồ sơ không ảnh hưởng đơn; xóa tài khoản xóa luôn hồ sơ. |
 | GET/PUT /consent | Theo Session và user nếu có; analytics/personalization riêng, ghi phiên bản lựa chọn |
 | POST /search/semantic | Public có quota; query + filters, trả sản phẩm đã kiểm tra DB |
 | POST /assistant/messages | Public có quota; message, petId tùy chọn (chỉ owner), trả answer/sources/productIds/fallback |
