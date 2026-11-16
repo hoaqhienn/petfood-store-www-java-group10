@@ -12,7 +12,7 @@ import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Component;
 
 @Component
-class SessionCartStore {
+public class SessionCartStore {
     private static final DefaultRedisScript<String> READ = new DefaultRedisScript<>("""
             local value = redis.call('GET', KEYS[1])
             if value then
@@ -68,6 +68,10 @@ class SessionCartStore {
         return Integer.toString(session.getMaxInactiveInterval());
     }
 
-    record Cart(String cartToken, long revision, Map<String, Integer> quantities) {}
+    public Cart readCart(HttpSession session) {
+        return read(session).cart();
+    }
+
+    public record Cart(String cartToken, long revision, Map<String, Integer> quantities) {}
     record Snapshot(String raw, Cart cart) {}
 }
