@@ -60,7 +60,8 @@ class SessionCartStore {
     }
 
     private static String key(HttpSession session) {
-        return "petfood:cart:" + session.getId();
+        Object originalId = session.getAttribute("petfood.cartKey");
+        return "petfood:cart:" + (originalId == null ? session.getId() : originalId);
     }
 
     private static String ttl(HttpSession session) {

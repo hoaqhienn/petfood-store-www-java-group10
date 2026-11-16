@@ -75,6 +75,35 @@ class InfrastructureIntegrationTest {
         mvc.perform(get("/api/v1/cart").cookie(session))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.revision").value(3))
                 .andExpect(jsonPath("$.items").isEmpty());
+
+        mvc.perform(post("/api/v1/cart/items").cookie(session).header(header, token)
+                        .contentType(MediaType.APPLICATION_JSON).content(add.replace(":0", ":3")))
+                .andExpect(status().isOk());
+        mvc.perform(post("/api/v1/auth/register").cookie(session).header(header, token)
+                        .contentType(MediaType.APPLICATION_JSON).content("""
+                                {"displayName":"Test User","email":" CartUser@example.test ","password":"demo-password"}
+                                """))
+                .andExpect(status().isCreated()).andExpect(jsonPath("$.emailStatus").value("PENDING"));
+        var login = mvc.perform(post("/api/v1/auth/login").cookie(session).header(header, token)
+                        .contentType(MediaType.APPLICATION_JSON).content("""
+                                {"email":"cartuser@example.test","password":"demo-password"}
+                                """))
+                .andExpect(status().isOk()).andReturn();
+        var rotated = login.getResponse().getCookie("SESSION");
+        assertThat(rotated).isNotNull();
+        assertThat(rotated.getValue()).isNotEqualTo(session.getValue());
+        mvc.perform(get("/api/v1/me").cookie(session)).andExpect(status().isUnauthorized());
+        mvc.perform(get("/api/v1/me").cookie(rotated))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.email").value("cartuser@example.test"));
+        mvc.perform(get("/api/v1/cart").cookie(rotated))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.items[0].quantity").value(2));
+        mvc.perform(post("/api/v1/auth/logout").cookie(rotated).header(header, token))
+                .andExpect(status().isForbidden());
+        var freshCsrf = json.readTree(mvc.perform(get("/api/v1/auth/csrf").cookie(rotated))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString());
+        mvc.perform(post("/api/v1/auth/logout").cookie(rotated).header(header, freshCsrf.get("token").asText()))
+                .andExpect(status().isNoContent());
+        mvc.perform(get("/api/v1/me").cookie(rotated)).andExpect(status().isUnauthorized());
     }
 
     @Test
