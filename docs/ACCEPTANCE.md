@@ -89,7 +89,7 @@ Chỉ ghi **Có test** khi integration test tương ứng đang chạy và pass 
 | AC19 | Có test | `AdminUserIntegrationTest` | — |
 | AC20 | Có test | `AdminOrderSearchIntegrationTest`, `TrackingIntegrationTest` | — |
 | AC21 | Có test | `AdminNotificationIntegrationTest` | Chưa thử với Mailpit thật |
-| AC22 | Chưa | — | Mất Redis trước/sau commit (cần kiểm thử thủ công) |
+| AC22 | Có test | `ConcurrentCheckoutIntegrationTest` | Giả lập lỗi kết nối trước thao tác và sau commit. Kiểm tra HTTP 503, giữ giỏ, trả đơn và dọn giỏ khi retry cùng key. |
 | AC23 | Có test | `PetProfileIntegrationTest` | — |
 | AC24 | Có test | `AssistantIntegrationTest` | Chưa chạy với Gemini thật |
 | AC25 | Có test | `AssistantIntegrationTest` | — |
@@ -105,4 +105,4 @@ Chỉ ghi **Có test** khi integration test tương ứng đang chạy và pass 
 | AC35 | Có test | `CheckoutRulesIntegrationTest`, `AdminCatalogIntegrationTest`, `PetProfileIntegrationTest` | — |
 | AC36 | Có test | `HideDuringCheckoutIntegrationTest` | — |
 
-Tổng: 35 có test, 0 một phần, 1 chưa. Ngoài ra chưa có E2E giao diện và chưa demo trọn luồng trên Docker.
+Tổng: 36 có test. Ngoài ra chưa có E2E giao diện và chưa demo trọn luồng trên Docker.
