@@ -147,6 +147,21 @@ class InfrastructureIntegrationTest {
                 Integer.class, product)).isEqualTo(6);
         mvc.perform(get("/api/v1/cart").cookie(rotated))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.items").isEmpty());
+        String cancellation = "{\"reason\":\"Changed my mind\",\"version\":0}";
+        mvc.perform(post("/api/v1/orders/{id}/cancel", orderId).cookie(rotated)
+                        .header(header, freshCsrf.get("token").asText())
+                        .contentType(MediaType.APPLICATION_JSON).content(cancellation))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.status").value("CANCELLED"))
+                .andExpect(jsonPath("$.version").value(1));
+        mvc.perform(post("/api/v1/orders/{id}/cancel", orderId).cookie(rotated)
+                        .header(header, freshCsrf.get("token").asText())
+                        .contentType(MediaType.APPLICATION_JSON).content(cancellation))
+                .andExpect(status().isConflict()).andExpect(jsonPath("$.code").value("VERSION_CONFLICT"));
+        assertThat(jdbc.queryForObject("SELECT available_stock FROM product WHERE id = ?",
+                Integer.class, product)).isEqualTo(8);
+        assertThat(jdbc.queryForObject("""
+                SELECT reason FROM order_history WHERE order_id = ? AND action = 'ORDER_CANCELLED'
+                """, String.class, java.util.UUID.fromString(orderId))).isEqualTo("Changed my mind");
         mvc.perform(post("/api/v1/auth/logout").cookie(rotated).header(header, freshCsrf.get("token").asText()))
                 .andExpect(status().isNoContent());
         mvc.perform(get("/api/v1/me").cookie(rotated)).andExpect(status().isUnauthorized());

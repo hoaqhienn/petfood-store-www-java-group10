@@ -39,7 +39,7 @@
 | POST /orders | Customer | Đã triển khai. Idempotency-Key header + cartToken/cartRevision,quoteToken,recipient,paymentMethod=COD |
 | GET /orders | Customer | Đã triển khai. Chỉ đơn của tài khoản hiện tại, `page` và `size`. Sắp xếp theo ngày đặt mới nhất. |
 | GET /orders/{id} | Chủ đơn | Đã triển khai. Trả thông tin nhận hàng và các dòng theo snapshot. ID không tồn tại hoặc đơn của người khác trả 404. |
-| POST /orders/{id}/cancel | Chủ đơn | reason,version; chỉ PENDING, trả đơn cập nhật |
+| POST /orders/{id}/cancel | Chủ đơn | Đã triển khai. Gửi reason và version cùng CSRF. Chỉ hủy PENDING, hoàn tồn và trả id, status, version mới. Đơn của người khác trả 404, version cũ hoặc trạng thái không cho hủy trả 409. |
 
 Khởi tạo phiên bằng GET `/cart` và GET `/auth/csrf` tuần tự trước khi gửi mutation. Gửi token CSRF theo `headerName` trả về. POST/PATCH trả giỏ mới, cùng cấu trúc GET. Mỗi dòng gồm `productId`, `quantity`, `name`, `unitPrice`, `availableStock` và `availabilityError` (null khi mua được). Dòng bị ẩn hoặc xóa vẫn có thể xóa khỏi giỏ, với tên/giá/tồn là null và không tính vào subtotal. Dòng thiếu tồn vẫn có giá hiện hành và được đánh dấu lỗi. Khi nhận `409 CART_CHANGED`, đọc lại giỏ trước khi người dùng xác nhận thao tác tiếp theo.
 
