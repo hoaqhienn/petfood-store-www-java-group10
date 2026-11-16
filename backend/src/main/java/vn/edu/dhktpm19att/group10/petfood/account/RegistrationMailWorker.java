@@ -31,11 +31,12 @@ class RegistrationMailWorker {
     void sendDueMail() {
         transactions.executeWithoutResult(transaction -> {
             var events = jdbc.query("""
-                    SELECT o.id, o.attempts, a.email_normalized
+                    SELECT o.id, o.attempts, a.email_normalized, o.payload->>'orderCode'
                     FROM notification_outbox o LEFT JOIN user_account a ON a.id = o.aggregate_id
-                    WHERE o.type = 'REGISTRATION' AND o.status = 'PENDING' AND o.next_attempt_at <= now()
+                    WHERE o.type IN ('REGISTRATION', 'ORDER_PLACED')
+                        AND o.status = 'PENDING' AND o.next_attempt_at <= now()
                     ORDER BY o.next_attempt_at, o.id LIMIT 1 FOR UPDATE OF o SKIP LOCKED
-                    """, (rs, row) -> new Event(rs.getObject(1, UUID.class), rs.getInt(2), rs.getString(3)));
+                    """, (rs, row) -> new Event(rs.getObject(1, UUID.class), rs.getInt(2), rs.getString(3), rs.getString(4)));
             if (!events.isEmpty()) deliver(events.get(0));
         });
     }
@@ -50,6 +51,10 @@ class RegistrationMailWorker {
         message.setTo(event.email());
         message.setSubject("PetFood | Đăng ký thành công");
         message.setText("Tài khoản PetFood của bạn đã được tạo. Bạn có thể đăng nhập bằng email đã đăng ký.");
+        if (event.orderCode() != null) {
+            message.setSubject("PetFood | Xác nhận đơn hàng COD");
+            message.setText("PetFood đã nhận đơn " + event.orderCode() + ". Bạn sẽ thanh toán khi nhận hàng.");
+        }
         try {
             mail.send(message);
         } catch (MailException exception) {
@@ -64,5 +69,5 @@ class RegistrationMailWorker {
                 event.id());
     }
 
-    private record Event(UUID id, int attempts, String email) {}
+    private record Event(UUID id, int attempts, String email, String orderCode) {}
 }

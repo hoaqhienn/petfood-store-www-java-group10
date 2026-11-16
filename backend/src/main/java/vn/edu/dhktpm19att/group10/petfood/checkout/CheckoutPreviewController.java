@@ -91,7 +91,7 @@ class CheckoutPreviewController {
         return error(503, "DEPENDENCY_UNAVAILABLE", "Tạm thời không thể báo giá.");
     }
 
-    private static ResponseEntity<ErrorBody> error(int status, String code, String message) {
+    static ResponseEntity<ErrorBody> error(int status, String code, String message) {
         return ResponseEntity.status(status).body(new ErrorBody(code, message, List.of(), UUID.randomUUID().toString()));
     }
 

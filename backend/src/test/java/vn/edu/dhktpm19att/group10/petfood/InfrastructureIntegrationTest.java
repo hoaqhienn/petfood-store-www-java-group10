@@ -105,14 +105,31 @@ class InfrastructureIntegrationTest {
                         .header(header, freshCsrf.get("token").asText()).contentType(MediaType.APPLICATION_JSON)
                         .content("{\"cartRevision\":3}"))
                 .andExpect(status().isConflict()).andExpect(jsonPath("$.code").value("CART_CHANGED"));
-        mvc.perform(post("/api/v1/checkout/preview").cookie(rotated)
+        var preview = mvc.perform(post("/api/v1/checkout/preview").cookie(rotated)
                         .header(header, freshCsrf.get("token").asText()).contentType(MediaType.APPLICATION_JSON)
                         .content("{\"cartRevision\":4}"))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.quoteToken").isString())
                 .andExpect(jsonPath("$.grandTotal").value("56000"))
-                .andExpect(jsonPath("$.items[0].quantity").value(2));
+                .andExpect(jsonPath("$.items[0].quantity").value(2)).andReturn();
         assertThat(jdbc.queryForObject("SELECT available_stock FROM product WHERE id = ?",
                 Integer.class, product)).isEqualTo(8);
+        var quote = json.readTree(preview.getResponse().getContentAsString());
+        String body = """
+                {"cartToken":"%s","cartRevision":4,"quoteToken":"%s","paymentMethod":"COD",
+                 "recipient":{"name":"Test User","phone":"0900000000","address":"Local QA"}}
+                """.formatted(quote.get("cartToken").asText(), quote.get("quoteToken").asText());
+        String key = java.util.UUID.randomUUID().toString();
+        var order = mvc.perform(post("/api/v1/orders").cookie(rotated).header(header, freshCsrf.get("token").asText())
+                        .header("Idempotency-Key", key).contentType(MediaType.APPLICATION_JSON).content(body))
+                .andExpect(status().isCreated()).andExpect(jsonPath("$.paymentStatus").value("UNPAID")).andReturn();
+        String orderId = json.readTree(order.getResponse().getContentAsString()).get("id").asText();
+        mvc.perform(post("/api/v1/orders").cookie(rotated).header(header, freshCsrf.get("token").asText())
+                        .header("Idempotency-Key", key).contentType(MediaType.APPLICATION_JSON).content(body))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.id").value(orderId));
+        assertThat(jdbc.queryForObject("SELECT available_stock FROM product WHERE id = ?",
+                Integer.class, product)).isEqualTo(6);
+        mvc.perform(get("/api/v1/cart").cookie(rotated))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.items").isEmpty());
         mvc.perform(post("/api/v1/auth/logout").cookie(rotated).header(header, freshCsrf.get("token").asText()))
                 .andExpect(status().isNoContent());
         mvc.perform(get("/api/v1/me").cookie(rotated)).andExpect(status().isUnauthorized());
