@@ -51,6 +51,11 @@ services:
       MAIL_FROM: ${MAIL_FROM:-noreply@petfood.local}
       PETFOOD_ADMIN_EMAIL: ${PETFOOD_ADMIN_EMAIL:-}
       PETFOOD_ADMIN_PASSWORD: ${PETFOOD_ADMIN_PASSWORD:-}
+      AI_ENABLED: ${AI_ENABLED:-false}
+      AI_API_KEY: ${AI_API_KEY:-}
+      AI_CHAT_MODEL: ${AI_CHAT_MODEL:-gemini-3.8-flash}
+      AI_EMBEDDING_MODEL: ${AI_EMBEDDING_MODEL:-gemini-embedding-001}
+      AI_QUOTA_PER_MINUTE: ${AI_QUOTA_PER_MINUTE:-10}
     ports:
       - "127.0.0.1:${BACKEND_PORT:-8080}:8080"
     depends_on:

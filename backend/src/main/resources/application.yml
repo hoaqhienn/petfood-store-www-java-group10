@@ -59,4 +59,13 @@ app:
     email: ${PETFOOD_ADMIN_EMAIL:}
     password: ${PETFOOD_ADMIN_PASSWORD:}
     display-name: ${PETFOOD_ADMIN_NAME:Quản trị viên}
+  ai:
+    # Off by default: search and the assistant then use keyword fallback and no API is called.
+    enabled: ${AI_ENABLED:false}
+    api-key: ${AI_API_KEY:}
+    chat-model: ${AI_CHAT_MODEL:gemini-3.8-flash}
+    embedding-model: ${AI_EMBEDDING_MODEL:gemini-embedding-001}
+    timeout-seconds: ${AI_TIMEOUT_SECONDS:15}
+    quota-per-minute: ${AI_QUOTA_PER_MINUTE:10}
+    index-interval-ms: ${AI_INDEX_INTERVAL_MS:60000}
 
