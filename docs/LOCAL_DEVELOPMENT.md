@@ -152,3 +152,20 @@ AI_API_KEY=<key của bạn>
 - Sau khi bật, job nền tạo embedding cho sản phẩm ACTIVE mỗi phút, 20 sản phẩm một lượt. Sản phẩm vừa sửa nội dung chỉ xuất hiện trong tìm kiếm ngữ nghĩa sau khi job chạy lại.
 - Mỗi Session tối đa `AI_QUOTA_PER_MINUTE` (mặc định 10) lượt tìm/hỏi mỗi phút. Google có thể tính phí khi vượt mức miễn phí; đặt giới hạn ngân sách trong tài khoản Google.
 - Key chỉ nằm ở backend và chỉ gửi trong header `x-goog-api-key`. Không gửi email, địa chỉ, tên thú cưng hay mật khẩu cho model.
+
+## 11. Thử API bằng Postman
+
+File [`docs/postman/PetFood.postman_collection.json`](postman/PetFood.postman_collection.json) chứa 55 request cho toàn bộ API, chia theo nhóm 0–8.
+
+1. Chạy backend (mục 3, nên bật dữ liệu demo ở mục 8 để có sẵn sản phẩm). Kiểm tra `http://localhost:8080/actuator/health` trả `UP`.
+2. Postman → **Import** → chọn file collection.
+3. Mở collection → tab **Variables**: giữ `baseUrl` = `http://localhost:8080`, điền `customerPassword` (8–64 ký tự, tự chọn) và `adminEmail`/`adminPassword` đúng với `.env` (mục 9). Đừng commit hay chia sẻ file đã chứa mật khẩu.
+4. Chạy theo thứ tự: **1** Danh sách sản phẩm → **2** Xem giỏ, Thêm sản phẩm → **3** Đăng ký, Đăng nhập → **4** Xem trước, Đặt đơn, Gửi lại cùng key, Chi tiết đơn, Hủy đơn. Các nhóm 5–7 chạy sau khi đăng nhập. Nhóm 8 bắt đầu bằng Đăng xuất rồi Đăng nhập admin.
+
+Collection tự lo các phần dễ vướng khi gọi tay:
+
+- Cookie `SESSION` do Postman giữ; mọi POST/PUT/PATCH/DELETE tự gọi `GET /api/v1/auth/csrf` và gắn header `X-CSRF-TOKEN` mới (token đổi sau khi đăng nhập).
+- Kết quả request trước được lưu vào biến cho request sau: `productId`, `cartRevision`, `quoteToken`, `orderId`, `version`…
+- Mỗi request có test kiểm tra mã trạng thái, nên có thể chạy cả thư mục bằng **Run folder**.
+
+Lỗi hay gặp: `403` khi đăng nhập/đăng ký nghĩa là đang đăng nhập sẵn (đăng xuất trước); `409 CART_CHANGED` nghĩa là `cartRevision` cũ (chạy lại Xem giỏ); `409 QUOTE_EXPIRED` sau 10 phút (chạy lại Xem trước); `401` nghĩa là phiên đã hết hoặc chưa đăng nhập.
