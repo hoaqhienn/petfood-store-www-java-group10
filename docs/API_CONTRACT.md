@@ -80,8 +80,8 @@ Mọi route dưới đây yêu cầu ADMIN ACTIVE.
 | PATCH /admin/users/{id} | displayName,phone,status,version; không tự khóa admin hiện tại/cuối cùng |
 | DELETE /admin/users/{id} | 409 USER_HAS_ORDERS nếu đã đặt dù hủy; bảo vệ admin |
 | GET /admin/orders; GET /admin/orders/{id} | Đã triển khai cho admin ACTIVE. Danh sách hỗ trợ page/size, orderCode, customer (tên hoặc email), status, dateFrom/dateTo (YYYY-MM-DD, bao gồm cả hai ngày theo giờ Việt Nam). Đơn mới nhất đứng trước. Mỗi mục gồm order, customerId, customerName, customerEmail. Chi tiết trả snapshot nhận hàng và dòng đơn. |
-| PATCH /admin/orders/{id}/items/{itemId} | quantity,reason,version; itemId phải thuộc đơn; giữ giá snapshot |
-| POST /admin/orders/{id}/transitions | toStatus,reason,version; COMPLETED thêm codReceived=true; không nhảy trạng thái |
+| PATCH /admin/orders/{id}/items/{productId} | Đã triển khai. Body `quantity` (nguyên 1–99), `reason`, `version`. Chỉ PENDING/CONFIRMED. Tăng thì trừ thêm tồn (sản phẩm và danh mục phải ACTIVE, đủ tồn); giảm thì hoàn tồn, kể cả khi sản phẩm đã ẩn. Giữ đơn giá snapshot, tính lại tổng, tăng version, ghi lịch sử và biến động tồn. Trả chi tiết đơn. Dòng không thuộc đơn trả 404 `ORDER_ITEM_NOT_FOUND`. |
+| POST /admin/orders/{id}/transitions | Đã triển khai. Body `toStatus`, `reason`, `version`, `codReceived`. Chỉ cho PENDING→CONFIRMED/CANCELLED, CONFIRMED→SHIPPING/CANCELLED, SHIPPING→COMPLETED; sai bước trả 409 `INVALID_ORDER_TRANSITION`. Hủy cần lý do và hoàn tồn đúng một lần. COMPLETED cần `codReceived: true`, đặt `paymentStatus` PAID và `paidAt`. Trả chi tiết đơn. |
 | GET /admin/notifications; POST /admin/notifications/{id}/retry | Xem trạng thái/lỗi đã che dữ liệu; retry FAILED, không tạo lại đơn/user |
 
 Đề xuất bổ sung điều chỉnh tồn có lý do thay cho ghi đè stock từ form sản phẩm; chỉ đưa vào P0 sau review. Với thao tác sửa đơn, khóa order trước. Các luồng cần kiểm tra cả danh mục và SKU khóa danh mục theo ID tăng dần, rồi SKU theo ID tăng dần. Xem [thứ tự khóa catalog](design/sequences/README.md#khóa-catalog-và-ac36). Version không thay thế transaction.

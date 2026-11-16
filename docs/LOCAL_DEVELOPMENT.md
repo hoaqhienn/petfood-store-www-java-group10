@@ -121,3 +121,13 @@ docker compose --profile app up --build -d --wait
 
 Mở `http://localhost:5173/products`. Demo có một sản phẩm còn hàng và một sản phẩm hết hàng hiển thị công khai. Một sản phẩm ẩn và một sản phẩm thuộc danh mục ẩn được tạo để kiểm tra API không công khai chúng. Chỉ bật seed trên cơ sở dữ liệu demo. Giữ cấu hình Flyway này khi chạy lại cùng cơ sở dữ liệu demo.
 
+## 9. Tài khoản quản trị đầu tiên
+
+Đăng ký công khai luôn tạo CUSTOMER. Để có ADMIN, đặt hai biến trong `.env` (không commit file này) rồi khởi động backend:
+
+```dotenv
+PETFOOD_ADMIN_EMAIL=admin@petfood.local
+PETFOOD_ADMIN_PASSWORD=<mật khẩu 8–64 ký tự do bạn tự chọn>
+```
+
+Khi khởi động, backend tạo một tài khoản ADMIN ACTIVE nếu email chưa tồn tại. Chạy lại không tạo trùng và không đổi mật khẩu. Nếu email đã thuộc một tài khoản khác, tài khoản đó được giữ nguyên. Để trống email thì bỏ qua bước này. Cấu hình sai (email không hợp lệ, mật khẩu ngoài 8–64 ký tự) làm backend dừng khởi động để tránh tưởng đã có admin.

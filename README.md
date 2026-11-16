@@ -22,7 +22,7 @@ Luồng mua hàng COD phía **backend** đã chạy được: xem sản phẩm �
 | Quản trị: đổi trạng thái/số lượng đơn, CRUD sản phẩm/danh mục/user | Chưa | Chưa |
 | Hồ sơ thú cưng, RAG/pgvector, tracking, cá nhân hóa | Chưa | Chưa |
 
-Kiểm thử tích hợp hiện mới phủ catalog, giỏ hàng và hạ tầng. Tài khoản, đặt/hủy đơn và quản trị đơn chưa có test tự động. Migration cũng chưa tạo sẵn tài khoản ADMIN.
+Kiểm thử tích hợp đi qua luồng chính: giỏ → đăng ký/đăng nhập → xem trước → đặt đơn (kể cả gửi lặp) → lịch sử → hủy đơn → quản trị đơn. Chưa có test cho hai khách tranh mua món cuối, email outbox và giỏ nhiều tab. Tài khoản ADMIN đầu tiên được tạo từ cấu hình local, xem [LOCAL_DEVELOPMENT.md](docs/LOCAL_DEVELOPMENT.md#9-tài-khoản-quản-trị-đầu-tiên).
 
 Tài liệu thiết kế (03–04/11): 15 chức năng, ma trận quyền, quy tắc COD/tồn kho, API, mô hình dữ liệu, ràng buộc RB01–RB22 trong [CONSTRAINTS.md](docs/CONSTRAINTS.md) và 36 kịch bản nghiệm thu.
 
