@@ -123,6 +123,23 @@ class InfrastructureIntegrationTest {
                         .header("Idempotency-Key", key).contentType(MediaType.APPLICATION_JSON).content(body))
                 .andExpect(status().isCreated()).andExpect(jsonPath("$.paymentStatus").value("UNPAID")).andReturn();
         String orderId = json.readTree(order.getResponse().getContentAsString()).get("id").asText();
+        jdbc.update("UPDATE product SET name = 'Updated catalog name', price = 30000 WHERE id = ?", product);
+        mvc.perform(get("/api/v1/orders").cookie(rotated).param("size", "1"))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.totalElements").value(1))
+                .andExpect(jsonPath("$.items[0].id").value(orderId));
+        mvc.perform(get("/api/v1/orders/{id}", orderId).cookie(rotated))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.recipient.address").value("Local QA"))
+                .andExpect(jsonPath("$.items[0].name").value("Test food"))
+                .andExpect(jsonPath("$.items[0].unitPrice").value("28000"));
+        mvc.perform(get("/api/v1/orders/{id}", orderId)).andExpect(status().isUnauthorized());
+        Long otherId = jdbc.queryForObject("""
+                INSERT INTO user_account (email_normalized, display_name, password_hash, role, status)
+                VALUES ('other-history@example.test', 'Other', 'unused', 'CUSTOMER', 'ACTIVE') RETURNING id
+                """, Long.class);
+        mvc.perform(get("/api/v1/orders/{id}", orderId).with(
+                        org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors
+                                .user(otherId.toString()).roles("CUSTOMER")))
+                .andExpect(status().isNotFound());
         mvc.perform(post("/api/v1/orders").cookie(rotated).header(header, freshCsrf.get("token").asText())
                         .header("Idempotency-Key", key).contentType(MediaType.APPLICATION_JSON).content(body))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.id").value(orderId));

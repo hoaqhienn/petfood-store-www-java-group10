@@ -21,7 +21,8 @@ public class SecurityConfig {
                     boolean profile = (request.getContextPath() + "/api/v1/me").equals(request.getRequestURI());
                     boolean checkout = (request.getContextPath() + "/api/v1/checkout/preview").equals(request.getRequestURI())
                             || (request.getContextPath() + "/api/v1/orders").equals(request.getRequestURI());
-                    response.setStatus(profile || checkout ? 401 : 403);
+                    boolean orderDetail = request.getRequestURI().startsWith(request.getContextPath() + "/api/v1/orders/");
+                    response.setStatus(profile || checkout || orderDetail ? 401 : 403);
                 }))
                 .logout(config -> config.logoutUrl("/api/v1/auth/logout")
                         .logoutSuccessHandler((request, response, authentication) -> response.setStatus(204)));
@@ -33,6 +34,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/v1/me").authenticated()
                 .requestMatchers(HttpMethod.POST, "/api/v1/checkout/preview").hasAnyRole("CUSTOMER", "ADMIN")
                 .requestMatchers(HttpMethod.POST, "/api/v1/orders").hasAnyRole("CUSTOMER", "ADMIN")
+                .requestMatchers(HttpMethod.GET, "/api/v1/orders", "/api/v1/orders/{id}").hasAnyRole("CUSTOMER", "ADMIN")
                 .requestMatchers(HttpMethod.POST, "/api/v1/cart/items").permitAll()
                 .requestMatchers(HttpMethod.PATCH, "/api/v1/cart/items/{id}").permitAll()
                 .requestMatchers(HttpMethod.DELETE, "/api/v1/cart/items/{id}").permitAll()
