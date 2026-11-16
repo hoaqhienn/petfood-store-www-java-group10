@@ -17,8 +17,10 @@ public class SecurityConfig {
             HttpSessionCsrfTokenRepository csrf) throws Exception {
         http.securityContext(config -> config.securityContextRepository(contexts))
                 .csrf(config -> config.csrfTokenRepository(csrf))
-                .exceptionHandling(config -> config.authenticationEntryPoint((request, response, error) ->
-                        response.setStatus(401)))
+                .exceptionHandling(config -> config.authenticationEntryPoint((request, response, error) -> {
+                    boolean profile = (request.getContextPath() + "/api/v1/me").equals(request.getRequestURI());
+                    response.setStatus(profile ? 401 : 403);
+                }))
                 .logout(config -> config.logoutUrl("/api/v1/auth/logout")
                         .logoutSuccessHandler((request, response, authentication) -> response.setStatus(204)));
         http.authorizeHttpRequests(auth -> auth
