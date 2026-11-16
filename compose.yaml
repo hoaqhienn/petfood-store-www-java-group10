@@ -49,6 +49,8 @@ services:
       MAIL_SMTP_AUTH: ${MAIL_SMTP_AUTH:-false}
       MAIL_STARTTLS: ${MAIL_STARTTLS:-false}
       MAIL_FROM: ${MAIL_FROM:-noreply@petfood.local}
+      PETFOOD_ADMIN_EMAIL: ${PETFOOD_ADMIN_EMAIL:-}
+      PETFOOD_ADMIN_PASSWORD: ${PETFOOD_ADMIN_PASSWORD:-}
     ports:
       - "127.0.0.1:${BACKEND_PORT:-8080}:8080"
     depends_on:
