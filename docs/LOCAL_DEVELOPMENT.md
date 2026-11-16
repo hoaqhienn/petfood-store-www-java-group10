@@ -119,7 +119,14 @@ $env:PETFOOD_FLYWAY_LOCATIONS = 'classpath:db/migration,classpath:db/demo'
 docker compose --profile app up --build -d --wait
 ```
 
-Mở `http://localhost:5173/products`. Demo có một sản phẩm còn hàng và một sản phẩm hết hàng hiển thị công khai. Một sản phẩm ẩn và một sản phẩm thuộc danh mục ẩn được tạo để kiểm tra API không công khai chúng. Chỉ bật seed trên cơ sở dữ liệu demo. Giữ cấu hình Flyway này khi chạy lại cùng cơ sở dữ liệu demo.
+Mở `http://localhost:5173/products`. Dữ liệu demo (thương hiệu và sản phẩm đều hư cấu) gồm:
+
+- 5 danh mục đang bán và 1 danh mục ẩn; 30 sản phẩm hiển thị công khai cho chó, mèo hoặc cả hai, đủ độ tuổi JUNIOR/ADULT/SENIOR/ALL. Có sản phẩm hết hàng (`DEMO-CAT-01`, `DEMO-DOGW-03`, `DEMO-CATW-05`), sản phẩm chỉ còn 1 đơn vị để thử hai người mua cùng lúc (`DEMO-DOG-08`, `DEMO-CAT-08`), và sản phẩm ẩn không được lộ ra (`DEMO-CAT-02`, `DEMO-TRT-07`, `DEMO-HIDDEN-01`).
+- 3 khách demo (`demo-khach-1..3@petfood.local`) chỉ để sở hữu đơn; mật khẩu của họ là chuỗi ngẫu nhiên đã bị bỏ nên không đăng nhập được. Tự tạo admin theo mục 9 và tự đăng ký khách mới để mua thử.
+- 6 đơn `PF-DEMO-0001..0006` đủ các trạng thái PENDING, CONFIRMED, SHIPPING, COMPLETED (đã thu) và CANCELLED. Đơn demo không trừ tồn và không gửi email.
+- Sự kiện tracking demo (`is_demo = true`): 40 phiên xem sản phẩm, 18 thêm giỏ, 10 bắt đầu checkout, 6 đặt đơn; 60 lượt hiển thị gợi ý với 9 click. Dashboard admin chỉ hiện các số này khi gọi `GET /api/v1/admin/analytics?includeDemo=true`.
+
+Chỉ bật seed trên cơ sở dữ liệu demo. Giữ cấu hình Flyway này khi chạy lại cùng cơ sở dữ liệu demo; chạy lại không tạo trùng.
 
 ## 9. Tài khoản quản trị đầu tiên
 

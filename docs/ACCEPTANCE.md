@@ -1,6 +1,6 @@
 # Kịch bản nghiệm thu dự kiến — 03/11/2026
 
-Tất cả dòng dưới đây là **TODO**, chưa phải kết quả test. CI hiện tại chỉ kiểm chứng bộ khung theo [VERIFICATION.md](VERIFICATION.md). P0 phải pass trước khi coi nghiệp vụ hoàn thành; P1 theo scope mở rộng.
+Bảng kịch bản dưới đây giữ nguyên từ bản phân tích. Trạng thái kiểm chứng thực tế xem [cuối trang](#trạng-thái-kiểm-chứng-ngày-1611). P0 phải pass trước khi coi nghiệp vụ hoàn thành; P1 theo scope mở rộng.
 
 Chuẩn bị: guest, customer A/B, admin, user bị khóa; 2 loại, SKU ACTIVE/INACTIVE/hết hàng/còn 1 đơn vị; đơn ở các trạng thái. Email local dùng Mailpit. Dữ liệu demo ghi nhãn, không tạo email/đơn thật. Trường hợp thay đổi DB phải reset fixture độc lập.
 
@@ -61,3 +61,48 @@ Số kịch bản hiện tại: **36**; AC01–AC30 giữ nguyên mã để trá
 - AI: tập 20–30 câu có dữ liệu đối chiếu, lưu kết quả đúng/sai/latency/cost, không chỉ đánh giá câu trả lời nghe hay.
 
 Mỗi PR liên kết F/BR/AC liên quan và ghi test nào đã chạy. Không đổi TODO thành PASS khi chỉ viết tài liệu/test chưa thực thi.
+
+## Trạng thái kiểm chứng ngày 16/11
+
+Chỉ ghi **Có test** khi integration test tương ứng đang chạy và pass trong CI (PostgreSQL + Redis thật, model AI được thay bằng bản giả). Chưa có E2E giao diện nào. **Một phần** nghĩa là đã có test cho một số ý của kịch bản; phần còn thiếu ghi ở cột cuối.
+
+| AC | Trạng thái | Test trong `backend/src/test` | Còn thiếu |
+|---|---|---|---|
+| AC01 | Một phần | `InfrastructureIntegrationTest.catalogShows…` | Lọc theo giá/loài/độ tuổi, phân trang, sort |
+| AC02 | Một phần | `InfrastructureIntegrationTest.catalogShows…` | Thêm giỏ/checkout sản phẩm hết hàng bị từ chối |
+| AC03 | Có test | `InfrastructureIntegrationTest.guestCart…` | — |
+| AC04 | Chưa | — | Số lượng 0/âm/thập phân/>99, quá 50 SKU |
+| AC05 | Một phần | `InfrastructureIntegrationTest.guestCart…` | Kiểm tra hash khác mật khẩu, nội dung mail đăng ký |
+| AC06 | Chưa | — | Hai lần đăng ký đồng thời cùng email |
+| AC07 | Có test | `InfrastructureIntegrationTest.guestCart…` | — |
+| AC08 | Có test | `Admin*IntegrationTest`, `InfrastructureIntegrationTest` | — |
+| AC09 | Một phần | `InfrastructureIntegrationTest.guestCart…` | Giỏ rỗng, thiếu địa chỉ, giá đổi sau preview |
+| AC10 | Có test | `InfrastructureIntegrationTest.guestCart…` | — |
+| AC11 | Có test | `ConcurrentCheckoutIntegrationTest` | — |
+| AC12 | Có test | `InfrastructureIntegrationTest.guestCart…` | — |
+| AC13 | Một phần | `CartTabsIntegrationTest` | Cùng key khác nội dung trả 409 |
+| AC14 | Có test | `InfrastructureIntegrationTest.guestCart…` | — |
+| AC15 | Có test | `AdminOrderCommandIntegrationTest`, `InfrastructureIntegrationTest` | — |
+| AC16 | Có test | `AdminOrderCommandIntegrationTest` | — |
+| AC17 | Có test | `AdminOrderCommandIntegrationTest`, `InfrastructureIntegrationTest` | — |
+| AC18 | Có test | `AdminCatalogIntegrationTest` | — |
+| AC19 | Có test | `AdminUserIntegrationTest` | — |
+| AC20 | Một phần | `InfrastructureIntegrationTest`, `TrackingIntegrationTest` | Tìm theo mã đơn và khoảng ngày |
+| AC21 | Có test | `AdminNotificationIntegrationTest` | Chưa thử với Mailpit thật |
+| AC22 | Chưa | — | Mất Redis trước/sau commit (cần kiểm thử thủ công) |
+| AC23 | Có test | `PetProfileIntegrationTest` | — |
+| AC24 | Có test | `AssistantIntegrationTest` | Chưa chạy với Gemini thật |
+| AC25 | Có test | `AssistantIntegrationTest` | — |
+| AC26 | Có test | `AssistantIntegrationTest` | Hành vi của model thật trước nội dung độc hại |
+| AC27 | Có test | `TrackingIntegrationTest` | — |
+| AC28 | Có test | `TrackingIntegrationTest` | — |
+| AC29 | Có test | `TrackingIntegrationTest` | — |
+| AC30 | Có test | `AdminCatalogIntegrationTest` | — |
+| AC31 | Có test | `CartTabsIntegrationTest` | — |
+| AC32 | Chưa | — | Người khác hoặc tài khoản bị khóa dùng lại key đặt đơn |
+| AC33 | Một phần | `AdminUserIntegrationTest`, `PetProfileIntegrationTest` | Đăng ký kèm `role` trong body |
+| AC34 | Có test | `AdminBootstrapIntegrationTest` | — |
+| AC35 | Một phần | `AdminCatalogIntegrationTest`, `PetProfileIntegrationTest` | Dữ liệu người nhận sai khi đặt đơn |
+| AC36 | Chưa | — | Ẩn danh mục/SKU cạnh tranh với checkout (thứ tự khóa đã cài, chưa có test) |
+
+Tổng: 23 có test, 8 một phần, 5 chưa. Ngoài ra chưa có E2E giao diện và chưa demo trọn luồng trên Docker.
