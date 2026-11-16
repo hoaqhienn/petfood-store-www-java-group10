@@ -7,7 +7,7 @@ Thời gian dự kiến: **01–30/11/2026**.
 
 ## Trạng thái hiện tại (16/11/2026)
 
-Backend đã đủ phần bắt buộc (P0): luồng mua COD từ giỏ guest đến email xác nhận, và toàn bộ API quản trị (đơn, người dùng, danh mục/sản phẩm, tồn kho, email). Giao diện mới có danh mục và giỏ hàng. AI và tracking (P1) chưa làm.
+Backend đã xong cả phần bắt buộc (P0) và mở rộng (P1): luồng mua COD từ giỏ guest đến email xác nhận, toàn bộ API quản trị, hồ sơ thú cưng, tìm kiếm/tư vấn AI bằng Gemini và tracking tự nguyện. Giao diện mới có danh mục và giỏ hàng; các màn hình còn lại đang làm.
 
 | Phần | Backend (API) | Frontend |
 |---|---|---|
@@ -21,9 +21,12 @@ Backend đã đủ phần bắt buộc (P0): luồng mua COD từ giỏ guest đ
 | Quản trị đơn: tìm kiếm, chi tiết, đổi trạng thái COD, sửa số lượng | Có | Chưa (`/admin` giữ chỗ) |
 | Quản trị người dùng, danh mục/sản phẩm, điều chỉnh tồn, gửi lại email lỗi | Có | Chưa |
 | Tài khoản ADMIN đầu tiên từ cấu hình local | Có | — |
-| Hồ sơ thú cưng, RAG/pgvector, tracking, cá nhân hóa | Chưa | Chưa |
+| Hồ sơ thú cưng của khách | Có | Chưa |
+| Tìm kiếm ngữ nghĩa và trợ lý tư vấn (Gemini + pgvector, tự chuyển sang tìm từ khóa khi AI tắt/lỗi) | Có (chưa chạy thử với key thật) | Chưa |
+| Tracking có xin đồng ý, gợi ý sản phẩm, dashboard funnel/CTR | Có | Chưa |
+| Dữ liệu demo: 30 sản phẩm, đơn đủ trạng thái, sự kiện tracking demo | Có | — |
 
-Kiểm thử tích hợp (chạy trong CI) đi qua luồng chính giỏ → đăng ký/đăng nhập → xem trước → đặt đơn (kể cả gửi lặp) → lịch sử → hủy đơn, các API quản trị, hai khách tranh mua món cuối, email khi SMTP lỗi và giỏ nhiều tab. Tài khoản ADMIN đầu tiên được tạo từ cấu hình local, xem [LOCAL_DEVELOPMENT.md](docs/LOCAL_DEVELOPMENT.md#9-tài-khoản-quản-trị-đầu-tiên).
+Kiểm thử tích hợp chạy trong CI; trạng thái từng kịch bản nghiệm thu AC01–AC36 xem ở [ACCEPTANCE.md](docs/ACCEPTANCE.md#trạng-thái-kiểm-chứng-ngày-1611). Tài khoản ADMIN đầu tiên được tạo từ cấu hình local, xem [LOCAL_DEVELOPMENT.md](docs/LOCAL_DEVELOPMENT.md#9-tài-khoản-quản-trị-đầu-tiên).
 
 Tài liệu thiết kế (03–04/11): 15 chức năng, ma trận quyền, quy tắc COD/tồn kho, API, mô hình dữ liệu, ràng buộc RB01–RB22 trong [CONSTRAINTS.md](docs/CONSTRAINTS.md) và 36 kịch bản nghiệm thu.
 

@@ -74,7 +74,8 @@ jobs:
           curl --fail --retry 5 --retry-delay 2 http://localhost:5173/ > /dev/null
           curl --fail http://localhost:5173/api/v1/info | grep 'PetFood'
           curl --fail http://localhost:5173/products | grep 'id="root"'
-          curl --fail http://localhost:5173/api/v1/products | jq -e '.totalElements == 2 and ([.items[].sku] | sort) == ["DEMO-CAT-01", "DEMO-DOG-01"]'
+          curl --fail 'http://localhost:5173/api/v1/products?size=100' | jq -e '.totalElements == 30 and ([.items[].sku] | any(. == "DEMO-CAT-02" or . == "DEMO-TRT-07" or . == "DEMO-HIDDEN-01") | not)'
+          curl --fail http://localhost:5173/api/v1/recommendations | jq -e '.personalized == false and (.items | length) == 4'
           curl --fail http://localhost:8080/actuator/health | grep 'UP'
       - if: failure()
         run: docker compose --profile app logs --no-color

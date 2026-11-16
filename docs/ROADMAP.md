@@ -2,9 +2,10 @@
 
 ## Trạng thái ngày 16/11
 
-- Đã merge PR #1–#24: tài liệu phân tích/UML (03–04/11), catalog (#9), giỏ hàng Session (#10), giao diện catalog/giỏ (#11), tài khoản Session (#12), checkout COD (#13–#14), lịch sử/hủy đơn (#15–#16), quản trị đơn (#17, #20), admin đầu tiên (#19), quản trị người dùng (#21), danh mục/sản phẩm/tồn kho (#22), email lỗi (#23), test cạnh tranh tồn kho (#24).
-- **Backend P0 đã xong**: luồng mua COD và toàn bộ API quản trị theo API_CONTRACT, có integration test trong CI cho AC11, AC15–AC19, AC21, AC30, AC33–AC34.
-- **Trễ so với kế hoạch:** giao diện tài khoản, checkout, đơn hàng và quản trị (phần Anh Minh) chưa có; T07 (15–21/11) chưa bắt đầu.
+- Đã merge PR #1–#28: phân tích/UML (#1–#8), catalog và giỏ (#9–#11), tài khoản (#12), checkout COD (#13–#16), quản trị đơn/người dùng/catalog/email (#17, #19–#23), test cạnh tranh và giỏ nhiều tab (#24–#25), hồ sơ thú cưng (#26), AI Gemini (#27), tracking (#28).
+- **Backend P0 và P1 đã xong**, kể cả T07–T08 sớm hơn kế hoạch. Trạng thái từng AC ở [ACCEPTANCE.md](ACCEPTANCE.md#trạng-thái-kiểm-chứng-ngày-1611).
+- **Rủi ro lớn nhất là giao diện:** frontend mới có catalog và giỏ hàng; còn tài khoản, checkout, đơn hàng, quản trị, chat AI, banner đồng ý và dashboard.
+- Chưa chạy thử Gemini với API key thật; máy của Hoàng Hiện chưa chạy được Docker nên chưa demo local trọn luồng.
 
 ## Backlog triển khai có phụ thuộc
 
@@ -20,9 +21,9 @@ Owner là người chủ đạo; người còn lại review và có thể nhận
 | T04 Cart guest → customer | 08–09/11 | Redis cart/revision, giữ giỏ login | Trang giỏ, feedback thiếu tồn/Session | T02–03; AC03–04,07,22 | Xong giỏ guest + giữ giỏ khi login (#10–#12), có test nhiều tab (AC31) |
 | T05 COD + email | 09–12/11 | Preview, idempotency, transaction, outbox | Checkout, confirm, lịch sử đơn, retry | T04; AC09–14,21–22 | Backend xong (#13–#16, #23, #24); thiếu giao diện checkout/lịch sử |
 | T06 Admin user/order | 12–14/11 | State machine, delta tồn, ownership | Danh sách/chi tiết, sửa, xác nhận xóa | T02–05; AC15–20 | Backend xong (#17, #20, #21); thiếu giao diện quản trị |
-| T07 Hồ sơ + vector/RAG | 15–21/11 | Pet API, model adapter, ingestion/retrieval | Hồ sơ, chat, tìm kiếm tự nhiên | P0 ổn định + provider; AC23–26 | Chưa bắt đầu |
-| T08 Tracking + cá nhân hóa | 22–26/11 | Consent/events, tổng hợp, ranking | Preferences, instrumentation, dashboard | T05,T07; AC27–29 | Chưa bắt đầu |
-| T09 Ổn định/báo cáo | 27–30/11 | Integration/concurrency, tài liệu | E2E/responsive, demo | P0 phải đạt; P1 ghi rõ phần còn thiếu | Chưa bắt đầu |
+| T07 Hồ sơ + vector/RAG | 15–21/11 | Pet API, model adapter, ingestion/retrieval | Hồ sơ, chat, tìm kiếm tự nhiên | P0 ổn định + provider; AC23–26 | Backend xong (#26, #27, Gemini); thiếu giao diện, chưa thử key thật |
+| T08 Tracking + cá nhân hóa | 22–26/11 | Consent/events, tổng hợp, ranking | Preferences, instrumentation, dashboard | T05,T07; AC27–29 | Backend xong (#28); thiếu giao diện |
+| T09 Ổn định/báo cáo | 27–30/11 | Integration/concurrency, tài liệu | E2E/responsive, demo | P0 phải đạt; P1 ghi rõ phần còn thiếu | Đã có dữ liệu demo và bảng trạng thái AC; còn test các AC thiếu, E2E, kịch bản demo, báo cáo |
 
 Ưu tiên khi thiếu thời gian: không cắt ràng buộc đề bài, phân quyền hoặc tính đúng đơn/tồn để làm dashboard đẹp. Giảm độ sâu cá nhân hóa, giữ tìm kiếm/RAG có căn cứ và fallback. Thanh toán online vẫn P2.
 
@@ -41,11 +42,13 @@ Owner là người chủ đạo; người còn lại review và có thể nhận
 ## Các việc tiếp theo
 
 1. Giao diện đăng nhập/đăng ký, checkout COD, lịch sử và hủy đơn.
-2. Giao diện quản trị: đơn (đổi trạng thái, sửa số lượng), người dùng, danh mục/sản phẩm/tồn kho, email lỗi.
-3. Hồ sơ thú cưng, chọn provider AI, embedding ingestion và retrieval có bộ lọc.
-4. Tracking tự nguyện, dashboard conversion và gợi ý có giải thích.
+2. Giao diện quản trị: đơn, người dùng, danh mục/sản phẩm/tồn kho, email lỗi.
+3. Sửa Docker trên máy Hoàng Hiện, chạy thử trọn luồng với dữ liệu demo và Gemini key thật.
+4. Bổ sung test cho các AC còn thiếu (xem ACCEPTANCE.md) và E2E giao diện.
+5. Giao diện hồ sơ thú cưng, chat AI, banner đồng ý tracking, dashboard.
+6. Kịch bản demo và báo cáo.
 
-Nếu thiếu thời gian, ưu tiên 1–2 (P0 theo đề bài) trước khi làm AI và tracking.
+Nếu thiếu thời gian, ưu tiên 1–4 (P0 theo đề bài) trước phần giao diện P1.
 
 ## Gợi ý nâng cấp có ích
 
