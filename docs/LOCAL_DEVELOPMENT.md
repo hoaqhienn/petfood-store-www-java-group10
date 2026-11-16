@@ -131,3 +131,17 @@ PETFOOD_ADMIN_PASSWORD=<mật khẩu 8–64 ký tự do bạn tự chọn>
 ```
 
 Khi khởi động, backend tạo một tài khoản ADMIN ACTIVE nếu email chưa tồn tại. Chạy lại không tạo trùng và không đổi mật khẩu. Nếu email đã thuộc một tài khoản khác, tài khoản đó được giữ nguyên. Để trống email thì bỏ qua bước này. Cấu hình sai (email không hợp lệ, mật khẩu ngoài 8–64 ký tự) làm backend dừng khởi động để tránh tưởng đã có admin.
+
+## 10. Bật trợ lý AI (Gemini)
+
+Mặc định AI tắt: tìm kiếm và trợ lý vẫn chạy bằng tìm theo từ khóa, không gọi API nào. Để bật, tạo API key trong Google AI Studio rồi đặt trong `.env` (không commit):
+
+```dotenv
+AI_ENABLED=true
+AI_API_KEY=<key của bạn>
+```
+
+- Model mặc định: chat `gemini-3.8-flash`, embedding `gemini-embedding-001` rút gọn còn 768 chiều (cột `vector(768)` trong V9). Đổi `AI_EMBEDDING_MODEL` thì vector cũ không bị trộn vì mỗi model có bản ghi riêng, nhưng số chiều phải giữ 768.
+- Sau khi bật, job nền tạo embedding cho sản phẩm ACTIVE mỗi phút, 20 sản phẩm một lượt. Sản phẩm vừa sửa nội dung chỉ xuất hiện trong tìm kiếm ngữ nghĩa sau khi job chạy lại.
+- Mỗi Session tối đa `AI_QUOTA_PER_MINUTE` (mặc định 10) lượt tìm/hỏi mỗi phút. Google có thể tính phí khi vượt mức miễn phí; đặt giới hạn ngân sách trong tài khoản Google.
+- Key chỉ nằm ở backend và chỉ gửi trong header `x-goog-api-key`. Không gửi email, địa chỉ, tên thú cưng hay mật khẩu cho model.
