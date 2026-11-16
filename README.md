@@ -7,7 +7,7 @@ Thời gian dự kiến: **01–30/11/2026**.
 
 ## Trạng thái hiện tại (16/11/2026)
 
-Luồng mua hàng COD phía **backend** đã chạy được: xem sản phẩm → giỏ hàng → đăng nhập → xem trước → đặt đơn → email xác nhận. Giao diện mới có danh mục và giỏ hàng; các phần quản trị ghi dữ liệu, AI và tracking chưa làm.
+Backend đã đủ phần bắt buộc (P0): luồng mua COD từ giỏ guest đến email xác nhận, và toàn bộ API quản trị (đơn, người dùng, danh mục/sản phẩm, tồn kho, email). Giao diện mới có danh mục và giỏ hàng. AI và tracking (P1) chưa làm.
 
 | Phần | Backend (API) | Frontend |
 |---|---|---|
@@ -18,11 +18,12 @@ Luồng mua hàng COD phía **backend** đã chạy được: xem sản phẩm �
 | Xem trước checkout COD, đặt đơn (trừ tồn, chống gửi lặp) | Có | Chưa |
 | Email đăng ký/xác nhận đơn qua outbox, tự thử lại | Có | — |
 | Lịch sử, chi tiết đơn và hủy đơn `PENDING` của khách | Có | Chưa |
-| Quản trị đơn: tìm kiếm, xem chi tiết | Có (chỉ đọc) | Chưa (`/admin` giữ chỗ) |
-| Quản trị: đổi trạng thái/số lượng đơn, CRUD sản phẩm/danh mục/user | Chưa | Chưa |
+| Quản trị đơn: tìm kiếm, chi tiết, đổi trạng thái COD, sửa số lượng | Có | Chưa (`/admin` giữ chỗ) |
+| Quản trị người dùng, danh mục/sản phẩm, điều chỉnh tồn, gửi lại email lỗi | Có | Chưa |
+| Tài khoản ADMIN đầu tiên từ cấu hình local | Có | — |
 | Hồ sơ thú cưng, RAG/pgvector, tracking, cá nhân hóa | Chưa | Chưa |
 
-Kiểm thử tích hợp đi qua luồng chính: giỏ → đăng ký/đăng nhập → xem trước → đặt đơn (kể cả gửi lặp) → lịch sử → hủy đơn → quản trị đơn. Chưa có test cho hai khách tranh mua món cuối, email outbox và giỏ nhiều tab. Tài khoản ADMIN đầu tiên được tạo từ cấu hình local, xem [LOCAL_DEVELOPMENT.md](docs/LOCAL_DEVELOPMENT.md#9-tài-khoản-quản-trị-đầu-tiên).
+Kiểm thử tích hợp (chạy trong CI) đi qua luồng chính giỏ → đăng ký/đăng nhập → xem trước → đặt đơn (kể cả gửi lặp) → lịch sử → hủy đơn, các API quản trị, hai khách tranh mua món cuối, email khi SMTP lỗi và giỏ nhiều tab. Tài khoản ADMIN đầu tiên được tạo từ cấu hình local, xem [LOCAL_DEVELOPMENT.md](docs/LOCAL_DEVELOPMENT.md#9-tài-khoản-quản-trị-đầu-tiên).
 
 Tài liệu thiết kế (03–04/11): 15 chức năng, ma trận quyền, quy tắc COD/tồn kho, API, mô hình dữ liệu, ràng buộc RB01–RB22 trong [CONSTRAINTS.md](docs/CONSTRAINTS.md) và 36 kịch bản nghiệm thu.
 
