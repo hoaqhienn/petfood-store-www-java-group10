@@ -12,16 +12,25 @@
         "exec": [
           "const method = pm.request.method.toUpperCase();",
           "if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(method)) {",
-          "  // Use the last token right away, then replace it with a fresh one before the request is sent.",
-          "  const header = pm.collectionVariables.get('csrfHeader') || 'X-CSRF-TOKEN';",
-          "  const token = pm.collectionVariables.get('csrfToken');",
-          "  if (token) pm.request.headers.upsert({ key: header, value: token });",
-          "  pm.sendRequest({ url: pm.collectionVariables.get('baseUrl') + '/api/v1/auth/csrf', method: 'GET' }, (err, res) => {",
+          "  // The CSRF token belongs to one Session. Send the current SESSION cookie explicitly: without it the",
+          "  // server would open a new anonymous Session, Postman would store that cookie, and a signed-in request",
+          "  // would then go out signed out (401).",
+          "  const session = pm.cookies.get('SESSION');",
+          "  pm.sendRequest({",
+          "    url: pm.collectionVariables.get('baseUrl') + '/api/v1/auth/csrf',",
+          "    method: 'GET',",
+          "    header: session ? [{ key: 'Cookie', value: 'SESSION=' + session }] : []",
+          "  }, (err, res) => {",
           "    if (err || res.code !== 200) { console.warn('Không lấy được CSRF token', err || res.code); return; }",
           "    const csrf = res.json();",
           "    pm.collectionVariables.set('csrfHeader', csrf.headerName);",
           "    pm.collectionVariables.set('csrfToken', csrf.token);",
           "    pm.request.headers.upsert({ key: csrf.headerName, value: csrf.token });",
+          "    if (!session) {",
+          "      // First request of a new Session: send it with the Session the token was issued for.",
+          "      const created = (res.headers.get('Set-Cookie') || '').match(/SESSION=([^;]+)/);",
+          "      if (created) pm.request.headers.upsert({ key: 'Cookie', value: 'SESSION=' + created[1] });",
+          "    }",
           "  });",
           "}"
         ]
@@ -280,7 +289,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/v1/products?q=hạt&species=CAT&lifeStage=&minPrice=&maxPrice=300000&page=0&size=20&sort=price,asc",
+              "raw": "{{baseUrl}}/api/v1/products?q=hạt&species=CAT&maxPrice=300000&page=0&size=20&sort=price,asc",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -300,11 +309,13 @@
                 },
                 {
                   "key": "lifeStage",
-                  "value": ""
+                  "value": "",
+                  "disabled": true
                 },
                 {
                   "key": "minPrice",
-                  "value": ""
+                  "value": "",
+                  "disabled": true
                 },
                 {
                   "key": "maxPrice",
@@ -1628,7 +1639,7 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{baseUrl}}/api/v1/admin/orders?orderCode=&customer=&status=PENDING&dateFrom=&dateTo=&page=0&size=20",
+                  "raw": "{{baseUrl}}/api/v1/admin/orders?status=PENDING&page=0&size=20",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -1641,11 +1652,13 @@
                   "query": [
                     {
                       "key": "orderCode",
-                      "value": ""
+                      "value": "",
+                      "disabled": true
                     },
                     {
                       "key": "customer",
-                      "value": ""
+                      "value": "",
+                      "disabled": true
                     },
                     {
                       "key": "status",
@@ -1653,11 +1666,13 @@
                     },
                     {
                       "key": "dateFrom",
-                      "value": ""
+                      "value": "",
+                      "disabled": true
                     },
                     {
                       "key": "dateTo",
-                      "value": ""
+                      "value": "",
+                      "disabled": true
                     },
                     {
                       "key": "page",
@@ -1832,7 +1847,7 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{baseUrl}}/api/v1/admin/users?q=&status=&role=CUSTOMER&page=0&size=20",
+                  "raw": "{{baseUrl}}/api/v1/admin/users?role=CUSTOMER&page=0&size=20",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -1845,11 +1860,13 @@
                   "query": [
                     {
                       "key": "q",
-                      "value": ""
+                      "value": "",
+                      "disabled": true
                     },
                     {
                       "key": "status",
-                      "value": ""
+                      "value": "",
+                      "disabled": true
                     },
                     {
                       "key": "role",
@@ -2008,7 +2025,7 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{baseUrl}}/api/v1/admin/categories?q=&status=",
+                  "raw": "{{baseUrl}}/api/v1/admin/categories",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -2021,11 +2038,13 @@
                   "query": [
                     {
                       "key": "q",
-                      "value": ""
+                      "value": "",
+                      "disabled": true
                     },
                     {
                       "key": "status",
-                      "value": ""
+                      "value": "",
+                      "disabled": true
                     }
                   ]
                 }
@@ -2145,7 +2164,7 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{baseUrl}}/api/v1/admin/products?q=&categoryId=&status=",
+                  "raw": "{{baseUrl}}/api/v1/admin/products",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -2158,15 +2177,18 @@
                   "query": [
                     {
                       "key": "q",
-                      "value": ""
+                      "value": "",
+                      "disabled": true
                     },
                     {
                       "key": "categoryId",
-                      "value": ""
+                      "value": "",
+                      "disabled": true
                     },
                     {
                       "key": "status",
-                      "value": ""
+                      "value": "",
+                      "disabled": true
                     }
                   ]
                 }
@@ -2405,7 +2427,7 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{baseUrl}}/api/v1/admin/notifications?status=FAILED&type=",
+                  "raw": "{{baseUrl}}/api/v1/admin/notifications?status=FAILED",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -2422,7 +2444,8 @@
                     },
                     {
                       "key": "type",
-                      "value": ""
+                      "value": "",
+                      "disabled": true
                     }
                   ]
                 }
@@ -2491,7 +2514,7 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{baseUrl}}/api/v1/admin/analytics?dateFrom=&dateTo=&includeDemo=true",
+                  "raw": "{{baseUrl}}/api/v1/admin/analytics?includeDemo=true",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -2504,11 +2527,13 @@
                   "query": [
                     {
                       "key": "dateFrom",
-                      "value": ""
+                      "value": "",
+                      "disabled": true
                     },
                     {
                       "key": "dateTo",
-                      "value": ""
+                      "value": "",
+                      "disabled": true
                     },
                     {
                       "key": "includeDemo",

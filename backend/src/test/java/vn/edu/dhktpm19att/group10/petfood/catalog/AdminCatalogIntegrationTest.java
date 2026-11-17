@@ -54,7 +54,7 @@ class AdminCatalogIntegrationTest {
                 .andExpect(status().isConflict()).andExpect(jsonPath("$.code").value("DUPLICATE_VALUE"));
         send(post("/api/v1/admin/categories"), "{\"name\":\"Bad\",\"slug\":\"Có Dấu\",\"status\":\"ACTIVE\"}")
                 .andExpect(status().isUnprocessableEntity());
-        mvc.perform(get("/api/v1/admin/categories").with(admin()).param("q", "admin-cat"))
+        mvc.perform(get("/api/v1/admin/categories").with(admin()).param("q", "admin-cat").param("status", ""))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.totalElements").value(1));
 
         String product = createProduct(category, "ADMIN-CAT-1", 3);

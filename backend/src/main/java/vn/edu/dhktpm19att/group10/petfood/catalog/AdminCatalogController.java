@@ -73,6 +73,7 @@ class AdminCatalogController {
             @RequestParam(defaultValue = "20") int size) {
         activeAdmin(auth);
         checkPage(page, size, q);
+        status = blankToNull(status);
         if (status != null && !STATUSES.contains(status)) throw invalidQuery();
         var where = new StringBuilder(" WHERE TRUE");
         var args = new ArrayList<Object>();
@@ -162,6 +163,7 @@ class AdminCatalogController {
             @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "20") int size) {
         activeAdmin(auth);
         checkPage(page, size, q);
+        status = blankToNull(status);
         if ((status != null && !STATUSES.contains(status)) || (categoryId != null && categoryId < 1)) {
             throw invalidQuery();
         }
@@ -448,6 +450,11 @@ class AdminCatalogController {
     private static long id(String value, String notFound) {
         if (!value.matches("[1-9][0-9]{0,17}")) throw missing(notFound, "Không tìm thấy dữ liệu.");
         return Long.parseLong(value);
+    }
+
+    /** An empty filter from a form (status=) means "no filter", not an invalid value. */
+    private static String blankToNull(String value) {
+        return value == null || value.isBlank() ? null : value.strip();
     }
 
     private static void checkPage(int page, int size, String q) {
