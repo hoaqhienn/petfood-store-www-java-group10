@@ -48,6 +48,9 @@ class AdminNotificationController {
             @RequestParam(required = false) String type, @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
         if (!activeAdmin(auth)) return forbidden();
+        // An empty filter from a form (status=) means "no filter", not an invalid value.
+        if (status != null && status.isBlank()) status = null;
+        if (type != null && type.isBlank()) type = null;
         if (page < 0 || size < 1 || size > 100 || (status != null && !STATUSES.contains(status))
                 || (type != null && !TYPES.contains(type))) {
             return error(400, "INVALID_QUERY", "Bộ lọc hoặc phân trang không hợp lệ.");

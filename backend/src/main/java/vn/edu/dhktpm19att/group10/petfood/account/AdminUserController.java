@@ -49,6 +49,9 @@ class AdminUserController {
             @RequestParam(required = false) String status, @RequestParam(required = false) String role,
             @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "20") int size) {
         activeAdmin(auth);
+        // An empty filter from a form (status=) means "no filter", not an invalid value.
+        if (status != null && status.isBlank()) status = null;
+        if (role != null && role.isBlank()) role = null;
         if (page < 0 || size < 1 || size > 100 || q.length() > 254
                 || (status != null && !STATUSES.contains(status)) || (role != null && !ROLES.contains(role))) {
             throw new Rejected(400, "INVALID_QUERY", "Bộ lọc hoặc phân trang không hợp lệ.");

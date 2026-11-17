@@ -54,6 +54,9 @@ class AdminUserIntegrationTest {
                 .andExpect(jsonPath("$.passwordHash").doesNotExist());
         mvc.perform(get("/api/v1/admin/users").with(admin()).param("status", "UNKNOWN"))
                 .andExpect(status().isBadRequest());
+        mvc.perform(get("/api/v1/admin/users").with(admin()).param("q", "users-customer").param("status", "")
+                        .param("role", ""))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.totalElements").value(1));
         mvc.perform(get("/api/v1/admin/users/{id}", "999999999999")).andExpect(status().isForbidden());
         mvc.perform(get("/api/v1/admin/users/{id}", customer).with(user(Long.toString(customer)).roles("CUSTOMER")))
                 .andExpect(status().isForbidden());

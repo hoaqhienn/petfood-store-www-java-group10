@@ -55,6 +55,9 @@ class AdminOrderSearchIntegrationTest {
                 .andExpect(jsonPath("$.totalElements").value(1))
                 .andExpect(jsonPath("$.items[0].order.orderCode").value("PF-OTHER-0004"));
         search("status", "PENDING").andExpect(jsonPath("$.totalElements").value(2));
+        // Empty filters sent by a form mean "no filter".
+        search("status", "", "orderCode", "", "dateFrom", "", "dateTo", "")
+                .andExpect(status().isOk()).andExpect(jsonPath("$.totalElements").value(4));
         search("size", "1", "page", "1")
                 .andExpect(jsonPath("$.totalPages").value(4))
                 .andExpect(jsonPath("$.items[0].order.orderCode").value("PF-SEARCH-0003"));

@@ -35,6 +35,8 @@ class AdminOrderController {
             @RequestParam(required = false) String customer, @RequestParam(required = false) String status,
             @RequestParam(required = false) LocalDate dateFrom, @RequestParam(required = false) LocalDate dateTo) {
         if (!activeAdmin(auth)) return forbidden();
+        // An empty filter from a form (status=) means "no filter", not an invalid value.
+        if (status != null && status.isBlank()) status = null;
         if (page < 0 || size < 1 || size > 100 || (orderCode != null && orderCode.length() > 100)
                 || (customer != null && customer.length() > 254) || (status != null && !STATUSES.contains(status))
                 || (dateFrom != null && dateTo != null && dateFrom.isAfter(dateTo))) return invalid();
